@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PetriCorp Chimera - 4D Quantum Shield</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    
+    body {
+      min-height: 100vh;
+      background: #020204;
+      color: #fff;
+      font-family: 'Inter', -apple-system, sans-serif;
+      overflow-x: hidden;
+    }
+    
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0a0f; }
+    ::-webkit-scrollbar-thumb { 
+      background: linear-gradient(180deg, #00ffff 0%, #8b00ff 100%);
+      border-radius: 3px;
+    }
+    
+    #particle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    
+    .content {
+      position: relative;
+      z-index: 10;
+      pointer-events: none;
+    }
+    
+    .content a, .content button {
+      pointer-events: auto;
+    }
+    
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 20px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+      pointer-events: auto;
+    }
+    
+    nav.scrolled {
+      background: rgba(2,2,4,0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0,255,255,0.1);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #00ffff 0%, #8b00ff 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 18px;
+    }
+    
+    .logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      letter-spacing: -0.5px;
+    }
+    
+    .logo-text span { color: #00ffff; }
+    
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+    
+    .nav-links a {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    
+    .nav-links a:hover { color: #00ffff; }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #00ffff 0%, #0088ff 100%);
+      border: none;
+      padding: 12px 28px;
+      border-radius: 8px;
+      color: #000;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary:hover { transform: scale(1.05); }
+    
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 24px;
+      position: relative;
+    }
+    
+    .hero-content {
+      max-width: 900px;
+      animation: fadeUp 1s ease-out;
+    }
+    
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 8px 20px;
+      background: rgba(0,255,255,0.1);
+      border: 1px solid rgba(0,255,255,0.3);
+      border-radius: 100px;
+      margin-bottom: 32px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #00ffff;
+      letter-spacing: 2px;
+    }
+    
+    h1 {
+      font-size: clamp(48px, 8vw, 80px);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #00ffff 0%, #8b00ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .hero p {
+      font-size: 20px;
+      color: rgba(255,255,255,0.7);
+      max-width: 600px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+    }
+    
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 16px 36px;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 500;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-secondary:hover { border-color: #00ffff; }
+    
+    .btn-large {
+      padding: 16px 36px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Stats overlay */
+    .stats-overlay {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.7);
+      padding: 16px 24px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,255,255,0.2);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      z-index: 100;
+      pointer-events: auto;
+    }
+    
+    .stats-overlay div {
+      margin-bottom: 4px;
+      color: rgba(255,255,255,0.7);
+    }
+    
+    .stats-overlay span {
+      color: #00ffff;
+    }
+    
+    /* Scroll Indicator */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: float 2s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-10px); }
+    }
+    
+    .scroll-mouse {
+      width: 24px;
+      height: 40px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      padding-top: 8px;
+    }
+    
+    .scroll-wheel {
+      width: 4px;
+      height: 8px;
+      background: #00ffff;
+      border-radius: 2px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .stats-overlay { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Particle Canvas -->
+  <canvas id="particle-canvas"></canvas>
+  
+  <div class="content">
+    <!-- Navigation -->
+    <nav id="navbar">
+      <div class="logo">
+        <div class="logo-icon">χ</div>
+        <span class="logo-text">PETRICORP<span> CHIMERA</span></span>
+      </div>
+      <div class="nav-links">
+        <a href="#technology">Technology</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="#investment">Investment</a>
+        <button class="btn-primary">Request Access</button>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="badge">4D QUANTUM DEFENSE SHIELD</div>
+        <h1>Threats Cannot Reach <span class="gradient-text">What They Cannot Perceive</span></h1>
+        <p>The tesseract rotates through dimensions imperceptible to attackers. Watch as the quantum shield deflects 100,000+ threat vectors in real-time.</p>
+        <div class="hero-buttons">
+          <button class="btn-primary btn-large">Request Demo <span>→</span></button>
+          <button class="btn-secondary">Learn More</button>
+        </div>
+      </div>
+      <div class="scroll-indicator">
+        <div class="scroll-mouse">
+          <div class="scroll-wheel"></div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Stats Overlay -->
+    <div class="stats-overlay">
+      <div>PARTICLES: <span id="particle-count">131,072</span></div>
+      <div>BLOCKED: <span id="blocked-count">0</span></div>
+      <div>PENETRATED: <span id="penetrated-count">0</span></div>
+      <div>SHIELD: <span id="shield-status">ACTIVE</span></div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // 4D TESSERACT QUANTUM SHIELD - PARTICLE FLOW DEFENSE
+    // 131,072 particles blocked by rotating 4D hypercube
+    // ============================================================
+    
+    class TesseractShield {
+      constructor(canvas) {
+        this.canvas = canvas;
+        this.gl = canvas.getContext('webgl', { 
+          alpha: true, 
+          antialias: true,
+          premultipliedAlpha: false
+        });
+        
+        if (!this.gl) {
+          console.warn('WebGL not supported');
+          return;
+        }
+        
+        // Enable extensions
+        this.floatExt = this.gl.getExtension('OES_texture_float');
+        this.gl.getExtension('OES_texture_float_linear');
+        
+        // Configuration - 131K particles (128 * 1024)
+        this.PARTICLE_COUNT = 131072;
+        this.TEXTURE_SIZE = Math.ceil(Math.sqrt(this.PARTICLE_COUNT));
+        
+        // 4D rotation angles
+        this.angleXY = 0;
+        this.angleXZ = 0;
+        this.angleXW = 0;
+        this.angleYZ = 0;
+        this.angleYW = 0;
+        this.angleZW = 0;
+        
+        // Tesseract size
+        this.tesseractSize = 0.8;
+        
+        // Stats
+        this.blockedCount = 0;
+        this.penetratedCount = 0;
+        
+        // Time
+        this.time = 0;
+        this.lastTime = performance.now() / 1000;
+        
+        // Mouse
+        this.mouse = { x: 0.5, y: 0.5 };
+        
+        this.init();
+      }
+      
+      init() {
+        this.initShaders();
+        this.initParticles();
+        this.initTesseract();
+        this.setupEvents();
+        this.resize();
+        this.animate();
+      }
+      
+      // ==================== SHADERS ====================
+      
+      initShaders() {
+        // Particle update shader
+        this.updateProgram = this.createProgram(
+          this.getUpdateVertexShader(),
+          this.getUpdateFragmentShader()
+        );
+        
+        // Particle render shader
+        this.renderProgram = this.createProgram(
+          this.getRenderVertexShader(),
+          this.getRenderFragmentShader()
+        );
+        
+        // Tesseract render shader
+        this.tesseractProgram = this.createProgram(
+          this.getTesseractVertexShader(),
+          this.getTesseractFragmentShader()
+        );
+        
+        // Core glow shader
+        this.coreProgram = this.createProgram(
+          this.getCoreVertexShader(),
+          this.getCoreFragmentShader()
+        );
+      }
+      
+      getUpdateVertexShader() {
+        return `
+          attribute vec2 aPosition;
+          varying vec2 vUv;
+          void main() {
+            vUv = aPosition * 0.5 + 0.5;
+            gl_Position = vec4(aPosition, 0.0, 1.0);
+          }
+        `;
+      }
+      
+      getUpdateFragmentShader() {
+        return `
+          precision highp float;
+          
+          varying vec2 vUv;
+          uniform sampler2D uPositions;
+          uniform sampler2D uVelocities;
+          uniform float uTime;
+          uniform float uDeltaTime;
+          
+          // 4D rotation matrices (passed as 6 angles for all rotation planes)
+          uniform float uAngleXY;
+          uniform float uAngleXZ;
+          uniform float uAngleXW;
+          uniform float uAngleYZ;
+          uniform float uAngleYW;
+          uniform float uAngleZW;
+          uniform float uTesseractSize;
+          
+          // Rotate in XY plane
+          vec4 rotateXY(vec4 p, float a) {
+            float c = cos(a), s = sin(a);
+            return vec4(p.x*c - p.y*s, p.x*s + p.y*c, p.z, p.w);
+          }
+          
+          // Rotate in XZ plane
+          vec4 rotateXZ(vec4 p, float a) {
+            float c = cos(a), s = sin(a);
+            return vec4(p.x*c - p.z*s, p.y, p.x*s + p.z*c, p.w);
+          }
+          
+          // Rotate in XW plane (4D rotation!)
+          vec4 rotateXW(vec4 p, float a) {
+            float c = cos(a), s = sin(a);
+            return vec4(p.x*c - p.w*s, p.y, p.z, p.x*s + p.w*c);
+          }
+          
+          // Rotate in YZ plane
+          vec4 rotateYZ(vec4 p, float a) {
+            float c = cos(a), s = sin(a);
+            return vec4(p.x, p.y*c - p.z*s, p.y*s + p.z*c, p.w);
+          }
+          
+          // Rotate in YW plane (4D rotation!)
+          vec4 rotateYW(vec4 p, float a) {
+            float c = cos(a), s = sin(a);
+            return vec4(p.x, p.y*c - p.w*s, p.z, p.y*s + p.w*c);
+          }
+          
+          // Rotate in ZW plane (4D rotation!)
+          vec4 rotateZW(vec4 p, float a) {
+            float c = cos(a), s = sin(a);
+            return vec4(p.x, p.y, p.z*c - p.w*s, p.z*s + p.w*c);
+          }
+          
+          // Apply all 4D rotations
+          vec4 rotate4D(vec4 p) {
+            p = rotateXY(p, uAngleXY);
+            p = rotateXZ(p, uAngleXZ);
+            p = rotateXW(p, uAngleXW);
+            p = rotateYZ(p, uAngleYZ);
+            p = rotateYW(p, uAngleYW);
+            p = rotateZW(p, uAngleZW);
+            return p;
+          }
+          
+          // Inverse rotation for checking if point is inside tesseract
+          vec4 inverseRotate4D(vec4 p) {
+            p = rotateZW(p, -uAngleZW);
+            p = rotateYW(p, -uAngleYW);
+            p = rotateYZ(p, -uAngleYZ);
+            p = rotateXW(p, -uAngleXW);
+            p = rotateXZ(p, -uAngleXZ);
+            p = rotateXY(p, -uAngleXY);
+            return p;
+          }
+          
+          // Check if point is inside the 4D hypercube (in local space)
+          float tesseractSDF(vec3 pos3D) {
+            // Lift 3D point to 4D (w=0 plane)
+            vec4 p4 = vec4(pos3D, 0.0);
+            
+            // Transform to tesseract local space
+            vec4 local = inverseRotate4D(p4);
+            
+            // 4D box SDF - max of all 4 dimensions
+            vec4 d = abs(local) - vec4(uTesseractSize);
+            float outside = length(max(d, 0.0));
+            float inside = min(max(max(max(d.x, d.y), d.z), d.w), 0.0);
+            
+            return outside + inside;
+          }
+          
+          // Get deflection normal from tesseract
+          vec3 tesseractNormal(vec3 pos) {
+            const float eps = 0.01;
+            float d = tesseractSDF(pos);
+            return normalize(vec3(
+              tesseractSDF(pos + vec3(eps,0,0)) - d,
+              tesseractSDF(pos + vec3(0,eps,0)) - d,
+              tesseractSDF(pos + vec3(0,0,eps)) - d
+            ));
+          }
+          
+          // Simplex noise for turbulence
+          vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+          vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+          vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+          vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+          
+          float snoise(vec3 v) {
+            const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+            const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+            
+            vec3 i = floor(v + dot(v, C.yyy));
+            vec3 x0 = v - i + dot(i, C.xxx);
+            vec3 g = step(x0.yzx, x0.xyz);
+            vec3 l = 1.0 - g;
+            vec3 i1 = min(g.xyz, l.zxy);
+            vec3 i2 = max(g.xyz, l.zxy);
+            vec3 x1 = x0 - i1 + C.xxx;
+            vec3 x2 = x0 - i2 + C.yyy;
+            vec3 x3 = x0 - D.yyy;
+            
+            i = mod289(i);
+            vec4 p = permute(permute(permute(
+                     i.z + vec4(0.0, i1.z, i2.z, 1.0))
+                   + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+                   + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+            
+            float n_ = 0.142857142857;
+            vec3 ns = n_ * D.wyz - D.xzx;
+            vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+            vec4 x_ = floor(j * ns.z);
+            vec4 y_ = floor(j - 7.0 * x_);
+            vec4 x = x_ * ns.x + ns.yyyy;
+            vec4 y = y_ * ns.x + ns.yyyy;
+            vec4 h = 1.0 - abs(x) - abs(y);
+            vec4 b0 = vec4(x.xy, y.xy);
+            vec4 b1 = vec4(x.zw, y.zw);
+            vec4 s0 = floor(b0)*2.0 + 1.0;
+            vec4 s1 = floor(b1)*2.0 + 1.0;
+            vec4 sh = -step(h, vec4(0.0));
+            vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+            vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+            vec3 p0 = vec3(a0.xy, h.x);
+            vec3 p1 = vec3(a0.zw, h.y);
+            vec3 p2 = vec3(a1.xy, h.z);
+            vec3 p3 = vec3(a1.zw, h.w);
+            vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+            p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+            vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+            m = m * m;
+            return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+          }
+          
+          void main() {
+            vec4 posData = texture2D(uPositions, vUv);
+            vec3 pos = posData.xyz;
+            float life = posData.w;
+            
+            vec4 velData = texture2D(uVelocities, vUv);
+            vec3 vel = velData.xyz;
+            float state = velData.w; // 0 = normal, 1 = blocked, 2 = penetrated
+            
+            // Target is the center (the protected system)
+            vec3 target = vec3(0.0);
+            vec3 toTarget = normalize(target - pos);
+            
+            // Base attraction to center
+            float distToCenter = length(pos);
+            vel += toTarget * 0.3 * uDeltaTime;
+            
+            // Add some turbulence
+            vec3 noisePos = pos * 2.0 + uTime * 0.2;
+            vec3 turbulence = vec3(
+              snoise(noisePos),
+              snoise(noisePos + 100.0),
+              snoise(noisePos + 200.0)
+            ) * 0.15;
+            vel += turbulence * uDeltaTime;
+            
+            // Check collision with tesseract
+            float sdf = tesseractSDF(pos);
+            
+            if (sdf < 0.05 && sdf > -0.3) {
+              // Near or inside the tesseract shell - DEFLECT
+              vec3 normal = tesseractNormal(pos);
+              
+              // Reflect velocity off the surface
+              float dotProduct = dot(vel, normal);
+              if (dotProduct < 0.0) {
+                vel = vel - 2.0 * dotProduct * normal;
+                vel *= 0.8; // Energy loss on collision
+                
+                // Push particle out
+                pos += normal * (0.06 - sdf);
+                state = 1.0; // Blocked
+              }
+            } else if (sdf < -0.3 && distToCenter < 0.3) {
+              // Made it through to the core!
+              state = 2.0; // Penetrated
+            }
+            
+            // Apply velocity
+            vel *= 0.98; // Damping
+            pos += vel * uDeltaTime;
+            
+            // Life decay
+            life -= uDeltaTime * 0.05;
+            
+            // Respawn dead particles at the edge
+            if (life <= 0.0 || distToCenter > 5.0) {
+              // Spawn on a sphere around the center
+              float phi = fract(sin(dot(vUv, vec2(12.9898, 78.233))) * 43758.5453) * 6.28318;
+              float theta = acos(2.0 * fract(sin(dot(vUv, vec2(93.989, 67.345))) * 24531.1234) - 1.0);
+              float r = 3.5 + fract(sin(dot(vUv, vec2(45.164, 29.673))) * 63422.7654) * 1.5;
+              
+              pos = vec3(
+                r * sin(theta) * cos(phi),
+                r * sin(theta) * sin(phi),
+                r * cos(theta)
+              );
+              
+              vel = -normalize(pos) * 0.5; // Initial velocity toward center
+              life = 0.8 + fract(sin(dot(vUv, vec2(23.14, 45.89))) * 12345.6789) * 0.4;
+              state = 0.0;
+            }
+            
+            gl_FragColor = vec4(pos, life);
+          }
+        `;
+      }
+      
+      getRenderVertexShader() {
+        return `
+          attribute float aIndex;
+          uniform sampler2D uPositions;
+          uniform sampler2D uVelocities;
+          uniform float uTextureSize;
+          uniform float uPointSize;
+          uniform mat4 uProjection;
+          uniform mat4 uView;
+          varying float vLife;
+          varying float vState;
+          varying float vDepth;
+          varying float vSpeed;
+          
+          void main() {
+            float idx = aIndex;
+            vec2 uv = vec2(
+              mod(idx, uTextureSize) / uTextureSize,
+              floor(idx / uTextureSize) / uTextureSize
+            );
+            
+            vec4 posData = texture2D(uPositions, uv);
+            vec4 velData = texture2D(uVelocities, uv);
+            
+            vec3 pos = posData.xyz;
+            vLife = posData.w;
+            vState = velData.w;
+            vSpeed = length(velData.xyz);
+            
+            vec4 viewPos = uView * vec4(pos, 1.0);
+            vDepth = -viewPos.z;
+            
+            gl_Position = uProjection * viewPos;
+            gl_PointSize = uPointSize * (2.0 / (1.0 + vDepth * 0.3)) * vLife;
+          }
+        `;
+      }
+      
+      getRenderFragmentShader() {
+        return `
+          precision highp float;
+          
+          varying float vLife;
+          varying float vState;
+          varying float vDepth;
+          varying float vSpeed;
+          
+          void main() {
+            vec2 coord = gl_PointCoord - 0.5;
+            float dist = length(coord);
+            
+            if (dist > 0.5) discard;
+            
+            float alpha = smoothstep(0.5, 0.1, dist) * vLife * 0.7;
+            
+            vec3 color;
+            
+            if (vState > 1.5) {
+              // Penetrated - bright green (threat got through!)
+              color = vec3(0.2, 1.0, 0.3);
+              alpha *= 1.5;
+            } else if (vState > 0.5) {
+              // Blocked - orange/red (deflected)
+              color = vec3(1.0, 0.4, 0.1);
+              alpha *= 1.2;
+            } else {
+              // Normal - incoming threat (red to yellow based on speed)
+              color = mix(vec3(1.0, 0.2, 0.1), vec3(1.0, 0.8, 0.2), vSpeed * 2.0);
+            }
+            
+            // Add glow
+            color += vec3(0.2) * (1.0 - dist * 2.0);
+            
+            gl_FragColor = vec4(color, alpha);
+          }
+        `;
+      }
+      
+      getTesseractVertexShader() {
+        return `
+          attribute vec3 aPosition;
+          uniform mat4 uProjection;
+          uniform mat4 uView;
+          uniform float uTime;
+          varying float vEdgeFactor;
+          
+          void main() {
+            vEdgeFactor = 1.0;
+            vec4 viewPos = uView * vec4(aPosition, 1.0);
+            gl_Position = uProjection * viewPos;
+          }
+        `;
+      }
+      
+      getTesseractFragmentShader() {
+        return `
+          precision highp float;
+          
+          varying float vEdgeFactor;
+          uniform float uTime;
+          
+          void main() {
+            // Cyan glow for the tesseract edges
+            vec3 color = vec3(0.0, 0.9, 1.0);
+            
+            // Pulsing effect
+            float pulse = 0.7 + 0.3 * sin(uTime * 3.0);
+            
+            gl_FragColor = vec4(color * pulse, 0.8 * pulse);
+          }
+        `;
+      }
+      
+      getCoreVertexShader() {
+        return `
+          attribute vec2 aPosition;
+          varying vec2 vUv;
+          void main() {
+            vUv = aPosition * 0.5 + 0.5;
+            gl_Position = vec4(aPosition, 0.0, 1.0);
+          }
+        `;
+      }
+      
+      getCoreFragmentShader() {
+        return `
+          precision highp float;
+          
+          varying vec2 vUv;
+          uniform float uTime;
+          uniform vec2 uResolution;
+          uniform mat4 uInvProjection;
+          uniform mat4 uInvView;
+          
+          void main() {
+            // Draw a glowing core at the center
+            vec2 center = vec2(0.5);
+            float dist = length(vUv - center);
+            
+            // Core glow
+            float glow = exp(-dist * 8.0) * 0.5;
+            glow += exp(-dist * 20.0) * 0.3;
+            
+            vec3 color = vec3(0.0, 0.8, 1.0) * glow;
+            color += vec3(1.0, 1.0, 1.0) * exp(-dist * 40.0) * 0.5;
+            
+            // Pulsing
+            float pulse = 0.8 + 0.2 * sin(uTime * 2.0);
+            
+            gl_FragColor = vec4(color * pulse, glow * pulse);
+          }
+        `;
+      }
+      
+      createProgram(vertexSrc, fragmentSrc) {
+        const gl = this.gl;
+        
+        const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vertexShader, vertexSrc);
+        gl.compileShader(vertexShader);
+        
+        if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+          console.error('Vertex shader error:', gl.getShaderInfoLog(vertexShader));
+          return null;
+        }
+        
+        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fragmentShader, fragmentSrc);
+        gl.compileShader(fragmentShader);
+        
+        if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+          console.error('Fragment shader error:', gl.getShaderInfoLog(fragmentShader));
+          return null;
+        }
+        
+        const program = gl.createProgram();
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+        gl.linkProgram(program);
+        
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+          console.error('Program link error:', gl.getProgramInfoLog(program));
+          return null;
+        }
+        
+        const uniforms = {};
+        const numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+        for (let i = 0; i < numUniforms; i++) {
+          const info = gl.getActiveUniform(program, i);
+          uniforms[info.name] = gl.getUniformLocation(program, info.name);
+        }
+        
+        const attributes = {};
+        const numAttributes = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
+        for (let i = 0; i < numAttributes; i++) {
+          const info = gl.getActiveAttrib(program, i);
+          attributes[info.name] = gl.getAttribLocation(program, info.name);
+        }
+        
+        return { program, uniforms, attributes };
+      }
+      
+      // ==================== PARTICLES ====================
+      
+      initParticles() {
+        const gl = this.gl;
+        const size = this.TEXTURE_SIZE;
+        
+        // Initialize particles on outer sphere
+        const positionData = new Float32Array(size * size * 4);
+        const velocityData = new Float32Array(size * size * 4);
+        
+        for (let i = 0; i < size * size; i++) {
+          const i4 = i * 4;
+          
+          // Spawn on sphere
+          const phi = Math.random() * Math.PI * 2;
+          const theta = Math.acos(2 * Math.random() - 1);
+          const r = 3.5 + Math.random() * 1.5;
+          
+          positionData[i4] = r * Math.sin(theta) * Math.cos(phi);
+          positionData[i4 + 1] = r * Math.sin(theta) * Math.sin(phi);
+          positionData[i4 + 2] = r * Math.cos(theta);
+          positionData[i4 + 3] = Math.random(); // Life
+          
+          // Initial velocity toward center
+          const speed = 0.3 + Math.random() * 0.3;
+          velocityData[i4] = -positionData[i4] / r * speed;
+          velocityData[i4 + 1] = -positionData[i4 + 1] / r * speed;
+          velocityData[i4 + 2] = -positionData[i4 + 2] / r * speed;
+          velocityData[i4 + 3] = 0; // State
+        }
+        
+        // Create textures
+        this.positionTextures = [
+          this.createDataTexture(positionData, size),
+          this.createDataTexture(positionData, size)
+        ];
+        
+        this.velocityTextures = [
+          this.createDataTexture(velocityData, size),
+          this.createDataTexture(velocityData, size)
+        ];
+        
+        // Create FBOs
+        this.positionFBOs = [
+          this.createFBO(this.positionTextures[0], size),
+          this.createFBO(this.positionTextures[1], size)
+        ];
+        
+        this.velocityFBOs = [
+          this.createFBO(this.velocityTextures[0], size),
+          this.createFBO(this.velocityTextures[1], size)
+        ];
+        
+        this.currentBuffer = 0;
+        
+        // Quad buffer for update pass
+        const quadVertices = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
+        this.quadBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.quadBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, quadVertices, gl.STATIC_DRAW);
+        
+        // Index buffer for render pass
+        const indices = new Float32Array(this.PARTICLE_COUNT);
+        for (let i = 0; i < this.PARTICLE_COUNT; i++) {
+          indices[i] = i;
+        }
+        this.indexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.indexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+      }
+      
+      createDataTexture(data, size) {
+        const gl = this.gl;
+        const texture = gl.createTexture();
+        
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.FLOAT, data);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        
+        return texture;
+      }
+      
+      createFBO(texture, size) {
+        const gl = this.gl;
+        const fbo = gl.createFramebuffer();
+        
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+        
+        return { fbo, size };
+      }
+      
+      // ==================== TESSERACT ====================
+      
+      initTesseract() {
+        // 4D hypercube vertices (16 vertices)
+        // Each vertex is (±1, ±1, ±1, ±1)
+        this.tesseractVertices4D = [];
+        for (let i = 0; i < 16; i++) {
+          this.tesseractVertices4D.push([
+            (i & 1) ? 1 : -1,
+            (i & 2) ? 1 : -1,
+            (i & 4) ? 1 : -1,
+            (i & 8) ? 1 : -1
+          ]);
+        }
+        
+        // Edges connect vertices that differ in exactly one coordinate (32 edges)
+        this.tesseractEdges = [];
+        for (let i = 0; i < 16; i++) {
+          for (let j = i + 1; j < 16; j++) {
+            // Count differing bits
+            let diff = i ^ j;
+            // Check if exactly one bit differs (power of 2)
+            if (diff && !(diff & (diff - 1))) {
+              this.tesseractEdges.push([i, j]);
+            }
+          }
+        }
+        
+        // Create buffer for tesseract lines
+        this.tesseractBuffer = this.gl.createBuffer();
+      }
+      
+      // 4D rotation matrices
+      rotate4D(point, angleXY, angleXZ, angleXW, angleYZ, angleYW, angleZW) {
+        let [x, y, z, w] = point;
+        
+        // XY rotation
+        let c = Math.cos(angleXY), s = Math.sin(angleXY);
+        [x, y] = [x*c - y*s, x*s + y*c];
+        
+        // XZ rotation
+        c = Math.cos(angleXZ); s = Math.sin(angleXZ);
+        [x, z] = [x*c - z*s, x*s + z*c];
+        
+        // XW rotation (4D!)
+        c = Math.cos(angleXW); s = Math.sin(angleXW);
+        [x, w] = [x*c - w*s, x*s + w*c];
+        
+        // YZ rotation
+        c = Math.cos(angleYZ); s = Math.sin(angleYZ);
+        [y, z] = [y*c - z*s, y*s + z*c];
+        
+        // YW rotation (4D!)
+        c = Math.cos(angleYW); s = Math.sin(angleYW);
+        [y, w] = [y*c - w*s, y*s + w*c];
+        
+        // ZW rotation (4D!)
+        c = Math.cos(angleZW); s = Math.sin(angleZW);
+        [z, w] = [z*c - w*s, z*s + w*c];
+        
+        return [x, y, z, w];
+      }
+      
+      // Project 4D to 3D using perspective projection
+      project4Dto3D(point4D, distance = 2) {
+        const [x, y, z, w] = point4D;
+        const scale = distance / (distance - w);
+        return [x * scale, y * scale, z * scale];
+      }
+      
+      updateTesseractBuffer() {
+        const gl = this.gl;
+        const size = this.tesseractSize;
+        
+        // Transform and project all vertices
+        const projected = this.tesseractVertices4D.map(v => {
+          const scaled = v.map(c => c * size);
+          const rotated = this.rotate4D(scaled, 
+            this.angleXY, this.angleXZ, this.angleXW,
+            this.angleYZ, this.angleYW, this.angleZW
+          );
+          return this.project4Dto3D(rotated, 3);
+        });
+        
+        // Build line segments
+        const lineData = [];
+        for (const [i, j] of this.tesseractEdges) {
+          lineData.push(...projected[i], ...projected[j]);
+        }
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.tesseractBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lineData), gl.DYNAMIC_DRAW);
+        
+        this.tesseractVertexCount = lineData.length / 3;
+      }
+      
+      // ==================== EVENTS ====================
+      
+      setupEvents() {
+        window.addEventListener('mousemove', (e) => {
+          this.mouse.x = e.clientX / window.innerWidth;
+          this.mouse.y = 1 - e.clientY / window.innerHeight;
+        });
+        
+        window.addEventListener('resize', () => this.resize());
+      }
+      
+      resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      }
+      
+      // ==================== RENDER LOOP ====================
+      
+      updateParticles(dt) {
+        const gl = this.gl;
+        const prog = this.updateProgram;
+        
+        if (!prog) return;
+        
+        const nextBuffer = 1 - this.currentBuffer;
+        
+        // Update positions
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.positionFBOs[nextBuffer].fbo);
+        gl.viewport(0, 0, this.TEXTURE_SIZE, this.TEXTURE_SIZE);
+        
+        gl.useProgram(prog.program);
+        
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.positionTextures[this.currentBuffer]);
+        gl.uniform1i(prog.uniforms.uPositions, 0);
+        
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, this.velocityTextures[this.currentBuffer]);
+        gl.uniform1i(prog.uniforms.uVelocities, 1);
+        
+        gl.uniform1f(prog.uniforms.uTime, this.time);
+        gl.uniform1f(prog.uniforms.uDeltaTime, dt);
+        gl.uniform1f(prog.uniforms.uTesseractSize, this.tesseractSize);
+        
+        // Pass 4D rotation angles
+        gl.uniform1f(prog.uniforms.uAngleXY, this.angleXY);
+        gl.uniform1f(prog.uniforms.uAngleXZ, this.angleXZ);
+        gl.uniform1f(prog.uniforms.uAngleXW, this.angleXW);
+        gl.uniform1f(prog.uniforms.uAngleYZ, this.angleYZ);
+        gl.uniform1f(prog.uniforms.uAngleYW, this.angleYW);
+        gl.uniform1f(prog.uniforms.uAngleZW, this.angleZW);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.quadBuffer);
+        gl.enableVertexAttribArray(prog.attributes.aPosition);
+        gl.vertexAttribPointer(prog.attributes.aPosition, 2, gl.FLOAT, false, 0, 0);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        
+        this.currentBuffer = nextBuffer;
+      }
+      
+      renderParticles() {
+        const gl = this.gl;
+        const prog = this.renderProgram;
+        
+        if (!prog) return;
+        
+        gl.useProgram(prog.program);
+        
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.positionTextures[this.currentBuffer]);
+        gl.uniform1i(prog.uniforms.uPositions, 0);
+        
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, this.velocityTextures[this.currentBuffer]);
+        gl.uniform1i(prog.uniforms.uVelocities, 1);
+        
+        gl.uniform1f(prog.uniforms.uTextureSize, this.TEXTURE_SIZE);
+        gl.uniform1f(prog.uniforms.uPointSize, 4.0 * window.devicePixelRatio);
+        
+        // Projection matrix
+        const aspect = this.canvas.width / this.canvas.height;
+        const fov = Math.PI / 4;
+        const near = 0.1;
+        const far = 100;
+        const f = 1 / Math.tan(fov / 2);
+        
+        const projection = new Float32Array([
+          f / aspect, 0, 0, 0,
+          0, f, 0, 0,
+          0, 0, (far + near) / (near - far), -1,
+          0, 0, (2 * far * near) / (near - far), 0
+        ]);
+        gl.uniformMatrix4fv(prog.uniforms.uProjection, false, projection);
+        
+        // View matrix - orbit camera
+        const camDist = 6;
+        const camAngle = this.time * 0.1;
+        const camHeight = Math.sin(this.time * 0.05) * 0.5;
+        const cx = Math.cos(camAngle) * camDist;
+        const cy = camHeight * 2;
+        const cz = Math.sin(camAngle) * camDist;
+        
+        // Simple lookAt
+        const forward = this.normalize([-cx, -cy, -cz]);
+        const right = this.normalize(this.cross([0, 1, 0], forward));
+        const up = this.cross(forward, right);
+        
+        const view = new Float32Array([
+          right[0], up[0], -forward[0], 0,
+          right[1], up[1], -forward[1], 0,
+          right[2], up[2], -forward[2], 0,
+          -this.dot(right, [cx, cy, cz]), -this.dot(up, [cx, cy, cz]), this.dot(forward, [cx, cy, cz]), 1
+        ]);
+        gl.uniformMatrix4fv(prog.uniforms.uView, false, view);
+        
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.indexBuffer);
+        gl.enableVertexAttribArray(prog.attributes.aIndex);
+        gl.vertexAttribPointer(prog.attributes.aIndex, 1, gl.FLOAT, false, 0, 0);
+        gl.drawArrays(gl.POINTS, 0, this.PARTICLE_COUNT);
+        
+        gl.disable(gl.BLEND);
+        
+        return { projection, view };
+      }
+      
+      renderTesseract(projection, view) {
+        const gl = this.gl;
+        const prog = this.tesseractProgram;
+        
+        if (!prog) return;
+        
+        this.updateTesseractBuffer();
+        
+        gl.useProgram(prog.program);
+        
+        gl.uniformMatrix4fv(prog.uniforms.uProjection, false, projection);
+        gl.uniformMatrix4fv(prog.uniforms.uView, false, view);
+        gl.uniform1f(prog.uniforms.uTime, this.time);
+        
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.tesseractBuffer);
+        gl.enableVertexAttribArray(prog.attributes.aPosition);
+        gl.vertexAttribPointer(prog.attributes.aPosition, 3, gl.FLOAT, false, 0, 0);
+        
+        gl.lineWidth(2);
+        gl.drawArrays(gl.LINES, 0, this.tesseractVertexCount);
+        
+        gl.disable(gl.BLEND);
+      }
+      
+      renderCore() {
+        const gl = this.gl;
+        const prog = this.coreProgram;
+        
+        if (!prog) return;
+        
+        gl.useProgram(prog.program);
+        
+        gl.uniform1f(prog.uniforms.uTime, this.time);
+        gl.uniform2f(prog.uniforms.uResolution, this.canvas.width, this.canvas.height);
+        
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.quadBuffer);
+        gl.enableVertexAttribArray(prog.attributes.aPosition);
+        gl.vertexAttribPointer(prog.attributes.aPosition, 2, gl.FLOAT, false, 0, 0);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        
+        gl.disable(gl.BLEND);
+      }
+      
+      // Vector math helpers
+      normalize(v) {
+        const len = Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+        return [v[0]/len, v[1]/len, v[2]/len];
+      }
+      
+      cross(a, b) {
+        return [
+          a[1]*b[2] - a[2]*b[1],
+          a[2]*b[0] - a[0]*b[2],
+          a[0]*b[1] - a[1]*b[0]
+        ];
+      }
+      
+      dot(a, b) {
+        return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+      }
+      
+      animate() {
+        if (!this.gl) return;
+        
+        const now = performance.now() / 1000;
+        const dt = Math.min(now - this.lastTime, 0.1);
+        this.lastTime = now;
+        this.time = now;
+        
+        // Update 4D rotation angles at different speeds for interesting motion
+        this.angleXY += dt * 0.3;
+        this.angleXZ += dt * 0.2;
+        this.angleXW += dt * 0.5;  // Main 4D rotation
+        this.angleYZ += dt * 0.25;
+        this.angleYW += dt * 0.4;  // 4D rotation
+        this.angleZW += dt * 0.35; // 4D rotation
+        
+        // Update stats periodically
+        if (Math.floor(now * 2) !== Math.floor((now - dt) * 2)) {
+          this.blockedCount += Math.floor(Math.random() * 500 + 200);
+          this.penetratedCount += Math.floor(Math.random() * 3);
+          
+          document.getElementById('blocked-count').textContent = this.blockedCount.toLocaleString();
+          document.getElementById('penetrated-count').textContent = this.penetratedCount.toLocaleString();
+        }
+        
+        const gl = this.gl;
+        
+        // Clear
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+        gl.clearColor(0.008, 0.008, 0.016, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        
+        // Update particle simulation
+        this.updateParticles(dt);
+        
+        // Render
+        this.renderCore();
+        const matrices = this.renderParticles();
+        if (matrices) {
+          this.renderTesseract(matrices.projection, matrices.view);
+        }
+        
+        requestAnimationFrame(() => this.animate());
+      }
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.getElementById('particle-canvas');
+      new TesseractShield(canvas);
+      
+      // Nav scroll effect
+      const nav = document.getElementById('navbar');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+          nav.classList.add('scrolled');
+        } else {
+          nav.classList.remove('scrolled');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
