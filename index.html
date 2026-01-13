@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PetriCorp: Chimera Protocol | Strategic Dossier</title>
+    <title>PetriCorp: Chimera Protocol | White Paper Dossier</title>
+    <!-- MathJax for LaTeX Rendering -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Three.js Global Build -->
+    <!-- Three.js for the Header Simulation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
     <style>
@@ -40,20 +43,20 @@
         /* --- 3D CANVAS --- */
         #canvas-wrapper {
             width: 100%;
-            height: 85vh;
+            height: 90vh;
             min-height: 600px;
             position: relative;
-            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+            background: radial-gradient(circle at center, #0f172a 0%, #000000 100%);
             overflow: hidden;
-            border-bottom: 1px solid #334155;
+            border-bottom: 1px solid #1e293b;
         }
 
         /* --- HUD ELEMENTS --- */
         .hud-panel {
-            backdrop-filter: blur(12px);
-            background: var(--color-panel);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(16px);
+            background: rgba(15, 23, 42, 0.6); /* Darker for contrast */
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
             transition: all 0.3s ease;
         }
 
@@ -62,18 +65,19 @@
             pointer-events: none;
             font-family: 'Courier New', monospace;
             font-size: 10px;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             color: var(--color-accent);
-            text-shadow: 0 0 5px rgba(56, 189, 248, 0.5);
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
             transition: opacity 0.3s;
             opacity: 0;
             white-space: nowrap;
+            text-transform: uppercase;
         }
         .hud-label.visible { opacity: 1; }
 
         /* --- REPORT LAYOUT --- */
         .report-container {
-            max-width: 80rem; /* 7xl */
+            max-width: 80rem; 
             margin: 0 auto;
             display: grid;
             grid-template-columns: 1fr;
@@ -107,6 +111,7 @@
         .toc-link:hover, .toc-link.active {
             color: var(--color-accent);
             border-left-color: var(--color-accent);
+            text-shadow: 0 0 8px rgba(56,189,248,0.5);
         }
 
         .article-section {
@@ -140,6 +145,29 @@
             padding: 1rem;
         }
 
+        /* --- MATH & CODE BLOCKS --- */
+        .math-block {
+            background: #0b1120;
+            border: 1px solid #334155;
+            border-left: 3px solid #38bdf8;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            font-size: 1.1em;
+            overflow-x: auto;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .code-snippet {
+            background: #1e293b;
+            color: #2dd4bf;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            border: 1px solid #334155;
+        }
+
         /* --- UTILS --- */
         .scanline {
             background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.3) 51%);
@@ -148,7 +176,7 @@
             top: 0; left: 0; right: 0; bottom: 0;
             pointer-events: none;
             z-index: 10;
-            opacity: 0.3;
+            opacity: 0.2;
         }
         
         .data-table {
@@ -167,42 +195,92 @@
             color: #f8fafc;
         }
 
-        /* Chart specific container to prevent stretch */
+        /* Chart Wrapper */
         .chart-wrapper {
             position: relative;
             width: 100%;
-            /* Fixed height ensures it doesn't stretch vertically */
-            height: 300px;
+            height: 400px;
             border-radius: 0.5rem;
             overflow: hidden;
             border: 1px solid #334155;
-            background: #0f172a;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            background: #020617; 
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
         }
-        @media (min-width: 768px) {
-            .chart-wrapper { height: 400px; }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* PDF Button */
+        .btn-pdf {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: rgba(15, 23, 42, 0.8);
+            border: 1px solid #38bdf8;
+            color: #38bdf8;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-pdf:hover {
+            background-color: #38bdf8;
+            color: #0f172a;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
+        }
+
+        .scenario-step {
+            position: relative;
+            padding-left: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        .scenario-number {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 1.8rem;
+            height: 1.8rem;
+            background: #1e293b;
+            border: 1px solid #38bdf8;
+            color: #38bdf8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
         }
     </style>
 </head>
 <body class="antialiased">
 
     <!-- NAV -->
-    <nav class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-700">
+    <nav class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-xl border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-sky-900/50 rounded flex items-center justify-center text-sky-400 font-bold border border-sky-700">
+                    <div class="w-8 h-8 bg-sky-900/30 rounded flex items-center justify-center text-sky-400 font-bold border border-sky-800">
                         ❖
                     </div>
                     <div>
                         <span class="font-bold text-lg tracking-tight text-slate-100 block leading-none">PetriCorp</span>
-                        <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Protocol Analysis</span>
+                        <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">White Paper Dossier</span>
                     </div>
                 </div>
-                <div class="hidden md:flex space-x-6 text-sm font-medium">
+                <div class="hidden md:flex space-x-6 text-sm font-medium items-center">
                     <a href="#canvas-wrapper" class="text-slate-400 hover:text-sky-400 transition-colors">Simulation</a>
                     <a href="#exec-summary" class="text-slate-400 hover:text-sky-400 transition-colors">Strategic Report</a>
                     <a href="#appendix" class="text-slate-400 hover:text-sky-400 transition-colors">Data</a>
+                    <a href="Quantum AI Cybersecurity White Paper Outline.pdf" class="btn-pdf">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Download Paper
+                    </a>
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="flex h-2 w-2 relative">
@@ -227,43 +305,55 @@
             <h1 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight mb-2 drop-shadow-lg">
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-400">CHIMERA</span> PROTOCOL
             </h1>
-            <p class="text-sm font-mono text-slate-400 uppercase tracking-[0.2em]">Hybrid Quantum-AI Defense System</p>
+            <p class="text-sm font-mono text-sky-500 uppercase tracking-[0.3em] opacity-80">Quantum-Simulated Architectures</p>
         </div>
 
         <!-- Left Control Panel -->
-        <div class="absolute top-1/2 -translate-y-1/2 left-8 w-64 hud-panel rounded-lg p-5 z-20">
+        <div class="absolute top-1/2 -translate-y-1/2 left-8 w-72 hud-panel rounded-lg p-5 z-20">
             <div class="mb-4 border-b border-slate-600 pb-2">
-                <h3 class="text-xs font-bold text-sky-400 uppercase">System Control</h3>
+                <h3 class="text-xs font-bold text-sky-400 uppercase tracking-widest">System Parameters</h3>
             </div>
             <div class="space-y-4">
                 <div class="flex justify-between text-xs font-mono text-slate-300">
-                    <span>Qubit State:</span>
-                    <span class="text-teal-400">COHERENT</span>
+                    <span>Topology:</span>
+                    <span class="text-teal-400">ATOMIZED</span>
                 </div>
                 <div class="flex justify-between text-xs font-mono text-slate-300">
-                    <span>Temp:</span>
-                    <span>15mK</span>
+                    <span>Sim. State:</span>
+                    <span class="text-sky-400">COHERENT</span>
                 </div>
-                <button id="btn-trigger" class="w-full py-2 bg-sky-600/20 hover:bg-sky-600/40 border border-sky-500/50 text-sky-400 text-xs font-bold uppercase rounded transition-all">
-                    Initiate Simulation
+                <div class="flex justify-between text-xs font-mono text-slate-300">
+                    <span>Oracle:</span>
+                    <span class="text-amber-400">MONITORING</span>
+                </div>
+                
+                <button id="btn-trigger" class="w-full py-3 bg-sky-900/30 hover:bg-sky-600/50 border border-sky-500/30 text-sky-400 text-xs font-bold uppercase rounded transition-all mt-4 hover:shadow-[0_0_20px_rgba(56,189,248,0.3)]">
+                    Initiate Viral Event
                 </button>
+                <p class="text-[10px] text-slate-500 leading-tight text-center">
+                    Simulates AI-driven viral attack. Janus encapsulates threat. Oracle learns pattern.
+                </p>
             </div>
         </div>
 
         <!-- Right Data Panel -->
-        <div class="absolute top-1/2 -translate-y-1/2 right-8 w-64 hud-panel rounded-lg p-5 z-20">
+        <div class="absolute top-1/2 -translate-y-1/2 right-8 w-72 hud-panel rounded-lg p-5 z-20">
             <div class="mb-4 border-b border-slate-600 pb-2">
-                <h3 class="text-xs font-bold text-sky-400 uppercase">Janus Telemetry</h3>
+                <h3 class="text-xs font-bold text-amber-400 uppercase tracking-widest">Neural Logs</h3>
             </div>
-            <div id="telemetry-log" class="font-mono text-[10px] text-slate-400 h-32 overflow-hidden flex flex-col justify-end">
-                <span>> Initializing sensor array...</span>
+            <div id="telemetry-log" class="font-mono text-[10px] text-slate-400 h-40 overflow-hidden flex flex-col justify-end">
+                <span>> System Initialized...</span>
+                <span>> Enterprise Surface Atomized...</span>
+                <span>> Model Context Protocol Linked...</span>
+                <span>> Oracle: Ground State Established.</span>
             </div>
         </div>
 
         <!-- 3D Labels -->
-        <div id="label-core" class="hud-label">D-WAVE CHIMERA CORE</div>
-        <div id="label-janus" class="hud-label">JANUS AI OBSERVER</div>
-        <div id="label-threat" class="hud-label" style="color:#ef4444; border-color:#ef4444">POLYMORPHIC ANOMALY</div>
+        <div id="label-core" class="hud-label">Chimera Core</div>
+        <div id="label-janus" class="hud-label">Janus Simulator</div>
+        <div id="label-oracle" class="hud-label" style="color: #fbbf24;">Oracle Governor</div>
+        <div id="label-attack" class="hud-label" style="color:#ef4444;">Anomaly Vector</div>
     </section>
 
 
@@ -274,15 +364,13 @@
             <!-- Sidebar Navigation -->
             <aside>
                 <nav class="sticky-toc">
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-4">Dossier Index</h4>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-4">Index</h4>
                     <a href="#exec-summary" class="toc-link">1. Executive Summary</a>
-                    <a href="#part-1" class="toc-link">2. Authorization Foundation</a>
-                    <a href="#part-2" class="toc-link">3. Chimera Architecture</a>
-                    <a href="#part-3" class="toc-link">4. Hybrid Engine</a>
-                    <a href="#part-4" class="toc-link">5. Cognitive Layer (AI)</a>
-                    <a href="#part-5" class="toc-link">6. Operational Kill Chain</a>
-                    <a href="#part-6" class="toc-link">7. Threat Landscape</a>
-                    <a href="#appendix" class="toc-link">8. Appendix</a>
+                    <a href="#part-1" class="toc-link">2. Atomized Landscape</a>
+                    <a href="#part-2" class="toc-link">3. Architecture</a>
+                    <a href="#part-3" class="toc-link">4. Chimera Engine</a>
+                    <a href="#part-4" class="toc-link">5. Operational Scenarios</a>
+                    <a href="#appendix" class="toc-link">6. Technical Review</a>
                 </nav>
             </aside>
 
@@ -293,261 +381,211 @@
                 <section id="exec-summary" class="article-section">
                     <h2 class="text-3xl font-bold text-sky-400 mb-6">1. Executive Summary</h2>
                     <p class="text-lg text-slate-300 leading-relaxed mb-6 font-semibold">
-                        The cybersecurity landscape has historically operated on a reactive paradigm: protect the perimeter, detect the breach, and respond to the incident. This "Detect and Respond" model is rapidly becoming obsolete.
+                        The contemporary cybersecurity landscape is defined by a rapidly expanding and fracturing attack surface, driven by the dissolution of traditional perimeters into "atomized" environments. To counter this, defense architectures must evolve from reactive posture management to active, simulation-driven deterrence.
                     </p>
                     <p>
-                        This report presents an exhaustive technical analysis of the <strong>Petricorp entity</strong> and its proprietary <strong>Chimera Security Layer</strong>. Based on a detailed review of technical documentation, our analysis identifies this system as a pioneering implementation of Predictive Pre-emption.
+                        This report introduces the <strong>Chimera Protocol</strong>, a unified cybersecurity framework that integrates a quantum-based and simulated qubit engine with a dual-AI agent architecture. The system is predicated on three core pillars: <strong>Chimera Engine</strong> (quantum-simulated optimization), <strong>Oracle</strong> (governance & topology), and <strong>Janus</strong> (viral simulation & encapsulation).
                     </p>
-                    <div class="bg-slate-800 p-6 rounded-lg border-l-4 border-sky-500 my-6">
-                        <h4 class="font-bold text-white mb-2">Core Findings: Convergence of Deep Tech</h4>
-                        <ul class="list-disc pl-5 space-y-2 text-slate-400">
-                            <li><strong>Fine-Grained Authorization:</strong> Utilizing SpiceDB to treat "Identity" as a hyper-connected graph (ReBAC).</li>
-                            <li><strong>Quantum Topology:</strong> Utilizing the "Chimera" graph to map network states into energy landscapes.</li>
-                            <li><strong>Generative AI Simulation:</strong> Deploying LLM agents to simulate insider threats for training defense models.</li>
-                        </ul>
+                    <div class="bg-slate-800 p-6 rounded-lg border-l-4 border-amber-500 my-6 shadow-xl">
+                        <h4 class="font-bold text-white mb-2">The Shift: Atomization to Defense</h4>
+                        <p class="text-sm text-slate-400 mb-2">
+                            Modern networks are <strong>DEED</strong> (Dispersed, Ephemeral, Encrypted, Diverse). Legacy visibility tools fail to detect gradual environmental shifts. Chimera transforms the enterprise environment from a static target into a dynamic, hostile terrain for adversaries.
+                        </p>
                     </div>
                 </section>
 
                 <!-- Part I -->
                 <section id="part-1" class="article-section">
-                    <h2 class="text-2xl font-bold text-white mb-4">Part I: The Authorization Foundation</h2>
-                    <h3 class="text-xl text-sky-500 mb-4">Petricorp and the Graph of Trust</h3>
+                    <h2 class="text-2xl font-bold text-white mb-4">2. The Atomized Threat Landscape</h2>
+                    <h3 class="text-xl text-sky-500 mb-4">Viral Propagation & AI Attacks</h3>
                     <p>
-                        To understand how the Chimera security layer functions, one must first examine the foundation: the Petricorp authorization engine. Petricorp utilizes <strong>Relationship-Based Access Control (ReBAC)</strong>, derived from the philosophical core of "Google Zanzibar."
+                        Adversaries now leverage artificial intelligence to execute viral, polymorphic attacks that propagate at machine speed. These agents operate like biological viruses, estimating the "reproduction number" (R0) required to sustain an infection within a specific network topology.
                     </p>
                     <p>
-                        Unlike static Role-Based Access Control (RBAC), ReBAC defines access via a graph of relationships. This allows surgical intervention—severing the relationship between a specific user and a resource without disrupting the entire system.
+                        They target the "interstices" of the atomized network—the APIs, the temporary credentials, and the unmonitored east-west traffic. The sheer volume of atomic units creates a signal-to-noise ratio that overwhelms human analysts and traditional SIEMs.
                     </p>
                     
-                    <h4 class="text-lg font-bold text-slate-200 mt-6 mb-2">1.2 The Mechanics of SpiceDB</h4>
-                    <p>The operational engine is SpiceDB, which stores authorization data as a Directed Acyclic Graph (DAG).</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
-                        <div class="bg-slate-800 p-4 rounded border border-slate-700">
-                            <h5 class="font-bold text-sky-400 mb-2">The Check</h5>
-                            <p class="text-sm">When a user acts, the app asks: <code>Check(User:Alice, Action:Read, Resource:Doc:123)</code>. SpiceDB traverses the graph in milliseconds.</p>
-                        </div>
-                        <div class="bg-slate-800 p-4 rounded border border-slate-700">
-                            <h5 class="font-bold text-sky-400 mb-2">"New Enemy" Consistency</h5>
-                            <p class="text-sm">Revocations are causally consistent. If Chimera detects a threat, the revocation is effective immediately, globally, preventing race conditions.</p>
-                        </div>
+                    <div class="bg-slate-800 p-4 rounded border border-slate-700 mt-4">
+                        <h5 class="font-bold text-sky-400 mb-2">The "Boiling Frog" Phenomenon</h5>
+                        <p class="text-sm">Attackers exploit subtle, gradual shifts in network behavior that static tools fail to flag until it is too late. Chimera's continuous topology evolution neutralizes this threat by constantly altering the environment.</p>
                     </div>
                 </section>
 
                 <!-- Part II -->
                 <section id="part-2" class="article-section">
-                    <h2 class="text-2xl font-bold text-white mb-4">Part II: The Chimera Architecture</h2>
-                    <h3 class="text-xl text-sky-500 mb-4">Quantum Topology in Defense</h3>
+                    <h2 class="text-2xl font-bold text-white mb-4">3. Architecture: Oracle & Janus</h2>
+                    <h3 class="text-xl text-amber-500 mb-4">The Governance-Simulation Loop</h3>
                     <p>
-                        The term "Chimera" refers to the specific hardware topology used in D-Wave Systems' quantum annealers. It is a lattice of bipartite unit cells, designed to solve optimization problems.
+                        Unlike standard AI models, Chimera bifurcates responsibility into a dual-AI system connected via <strong>Model Context Protocol (MCP)</strong>.
                     </p>
-                    <p>
-                        Security is fundamentally an <strong>Optimization Problem</strong>. The goal is to find the network state that minimizes "Risk Energy." By mapping the network state onto a Chimera graph, the system uses quantum annealing to find the "Ground State" (Normal Behavior). Any deviation is an energy spike.
-                    </p>
-                    
-                    <!-- UPDATED CHART SECTION -->
-                    <div class="my-8">
-                        <div class="flex justify-between items-end mb-2">
-                            <h4 class="text-sm font-bold text-sky-500 uppercase tracking-widest">Fig 2.1: Hamiltonian Energy Minimization</h4>
-                            <div class="flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
-                                <span class="text-[10px] font-mono text-teal-400">LIVE FEED</span>
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+                        <div class="bg-slate-800 p-4 rounded border border-amber-700/30">
+                            <h5 class="font-bold text-amber-400 mb-2">Oracle (Governance)</h5>
+                            <p class="text-sm">Oracle acts as the Guardian Agent. It maintains the "ground truth" of the enterprise topology, enforces security mandates, and governs the Janus simulator. It solves the "Oracle Problem" by synchronizing the simulation environment with real-time telemetry.</p>
                         </div>
-                        
-                        <!-- Chart Container: Fixed height, relative positioning to stop stretch -->
-                        <div class="chart-wrapper">
-                            <canvas id="energyChart"></canvas>
+                        <div class="bg-slate-800 p-4 rounded border border-sky-700/30">
+                            <h5 class="font-bold text-sky-400 mb-2">Janus (Simulation)</h5>
+                            <p class="text-sm">Janus is the dual-faced adversarial simulator. It models AI-based viral propagation and utilizes quantum inference to encapsulate and study threats. It acts as a bridge between the production system and the simulation, turning attacker behavior into defense data.</p>
                         </div>
-                        
-                        <p class="text-xs text-center mt-2 text-slate-500">Real-time visualization of anomaly detection. Spikes indicate deviation from ground state.</p>
                     </div>
-
-                    <p>
-                        <strong>The Physics of Intrusion:</strong> Instead of signatures, the system looks at the Energy Landscape.
-                        <br>
-                        <em>Scenario:</em> An attacker moves laterally connecting User X to Database Z.
-                        <br>
-                        <em>Result:</em> The total energy (Hamiltonian) spikes. The algorithm detects this instantly without needing to know the attack signature.
-                    </p>
                 </section>
 
-                <!-- Part III -->
+                <!-- Part III: Mathematics Section -->
                 <section id="part-3" class="article-section">
-                    <h2 class="text-2xl font-bold text-white mb-4">Part III: The Hybrid Computational Engine</h2>
+                    <h2 class="text-2xl font-bold text-white mb-4">4. The Chimera Engine</h2>
+                    <h3 class="text-xl text-sky-500 mb-4">Topology & Optimization Mathematics</h3>
                     <p>
-                        The system uses a hybrid model of physical qubits and <strong>Simulated Qubits</strong>. Physical quantum computers are too scarce for edge deployment. The solution is a tiered architecture.
+                        The Chimera Engine’s efficiency is derived from mapping network security states onto a hardware-specific lattice. Cyber defense is fundamentally a combinatorial optimization problem: finding the optimal configuration of security controls to minimize risk across a vast, dynamic graph.
                     </p>
                     
-                    <!-- HYBRID ENGINE FIGURE -->
-                    <div class="my-8 bg-slate-800 p-6 rounded-lg border border-slate-700">
-                        <h4 class="text-sm font-bold text-sky-500 uppercase tracking-widest mb-4">Fig 3.1: Hybrid Compute Topology</h4>
-                        
-                        <div class="flex flex-col md:flex-row gap-4 items-center">
-                            <!-- Edge Node -->
-                            <div class="schematic-box flex-1 p-4 w-full">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-xs font-bold text-white">THE EDGE</span>
-                                    <span class="bg-teal-900 text-teal-300 text-[10px] px-2 py-0.5 rounded">GPU / FPGA</span>
-                                </div>
-                                <div class="text-center py-4">
-                                    <h5 class="text-xl font-bold text-sky-400">Simulated Qubits</h5>
-                                    <p class="text-xs text-slate-400 mt-1">Simulated Bifurcation</p>
-                                </div>
-                                <div class="text-xs text-slate-500 mt-2 border-t border-slate-700 pt-2">
-                                    Task: Real-time filtering (Wire-speed)
-                                </div>
-                            </div>
+                    <h4 class="font-bold text-slate-300 mt-6 mb-2">The Chimera Graph Structure</h4>
+                    <p class="text-sm text-slate-400 mb-4">
+                        The graph \( G_{m,n} \) is defined as an \( m \times n \) grid of unit cells. Each unit cell is a complete bipartite graph \( K_{4,4} \). The set of qubits \( Q \) in a unit cell is partitioned into two sets \( U \) and \( V \), such that:
+                    </p>
 
-                            <!-- Flow Arrow -->
-                            <div class="flow-arrow hidden md:flex">
-                                ➔
-                            </div>
-                            <div class="flow-arrow md:hidden">
-                                ↓
-                            </div>
+                    <div class="math-block">
+                        $$ \forall u \in U, v \in V : \{u, v\} \in E $$                     </div>
 
-                            <!-- Core Node -->
-                            <div class="schematic-box flex-1 p-4 w-full">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-xs font-bold text-white">THE CORE</span>
-                                    <span class="bg-indigo-900 text-indigo-300 text-[10px] px-2 py-0.5 rounded">QPU (D-Wave)</span>
-                                </div>
-                                <div class="text-center py-4">
-                                    <h5 class="text-xl font-bold text-sky-400">Physical Qubits</h5>
-                                    <p class="text-xs text-slate-400 mt-1">Quantum Annealing</p>
-                                </div>
-                                <div class="text-xs text-slate-500 mt-2 border-t border-slate-700 pt-2">
-                                    Task: Global Parameter Optimization
-                                </div>
-                            </div>
-                        </div>
+                    <h4 class="font-bold text-slate-300 mt-6 mb-2">The Vulnerability Energy Function</h4>
+                    <p class="text-sm text-slate-400 mb-4">
+                        The engine identifies the "global minimum" of the network's vulnerability state by solving an Ising Model Hamiltonian. The "vulnerability energy" \( E(s) \) is expressed as:
+                    </p>
 
-                        <div class="mt-4 text-xs text-slate-400 italic text-center">
-                            *99% of traffic is handled by Simulated Qubits at room temperature. Only 1% reaches the cryogenic core for model tuning.
-                        </div>
-                    </div>
+                    <div class="math-block">
+                        $$ E(s) = -\sum_{i} h_i s_i - \sum_{i, j} J_{ij} s_i s_j $$                     </div>
 
-                    <h4 class="text-lg font-bold text-slate-200 mt-4">3.1 Simulated Qubits: The Workhorse</h4>
-                    <ul class="list-disc pl-5 space-y-2 text-slate-400 mb-6">
-                        <li><strong>Simulated Bifurcation (SB):</strong> Uses non-linear Hamiltonian dynamics to solve Ising models on standard GPUs.</li>
-                        <li><strong>Wire-Speed Security:</strong> Can analyze packets as fast as they flow through the fiber.</li>
-                        <li><strong>Room Temperature:</strong> Requires no cryogenic cooling.</li>
-                    </ul>
+                    <p class="text-sm text-slate-400 mt-4 mb-4">
+                        Where:
+                        <ul class="list-disc pl-5 mt-2 space-y-1">
+                            <li>\( s \) represents the state (secure/compromised) of a simulated qubit.</li>
+                            <li>\( h_i \) represents the local "bias" or inherent vulnerability of a specific node.</li>
+                            <li>\( J_{ij} \) represents the "coupling strength" or dependency between nodes \( i \) and \( j \) in the atomized network.</li>
+                        </ul>
+                    </p>
 
-                    <h4 class="text-lg font-bold text-slate-200 mt-4">3.2 The Role of Physical Qubits</h4>
-                    <p>
-                        The physical D-Wave hardware acts as the "Oracle." It periodically takes a snapshot of the entire network history to perform a Global Optimization, training the parameters for the simulated engines at the edge.
+                    <p class="text-sm bg-slate-800 p-4 rounded border-l-4 border-sky-500">
+                        The engine uses <strong>Simulated Bifurcation (SB)</strong> to find configuration \( s \) that minimizes \( E(s) \) in milliseconds, effectively tunneling through local minima to find the true ground state of security.
                     </p>
                 </section>
 
-                <!-- Part IV -->
+                <!-- Part IV: Detailed Scenarios -->
                 <section id="part-4" class="article-section">
-                    <h2 class="text-2xl font-bold text-white mb-4">Part IV: The Cognitive Layer</h2>
-                    <h3 class="text-xl text-sky-500 mb-4">AI and Threat Simulation (Janus)</h3>
-                    <p>
-                        While Quantum Topology provides structure, the system requires Intelligence. This is the role of <strong>Janus (Chimera AI)</strong>.
-                    </p>
-                    <p>
-                        Security AIs suffer from a lack of training data. Real attacks are rare. The Chimera AI solves this by generating <strong>Synthetic Threat Data</strong>. It uses LLMs to create autonomous "Agents" (e.g., "Disgruntled Developer") and unleashes them into a "Digital Twin" of the network.
-                    </p>
-                    <p>
-                        The AI learns the <em>Precursors of Attack</em>. It learns that a sudden spike in "Read" operations on the Source Code repository often precedes exfiltration.
-                    </p>
-                </section>
+                    <h2 class="text-2xl font-bold text-white mb-4">5. Expanded Operational Scenario Workflows</h2>
+                    <p class="mb-6">These workflows demonstrate how the <strong>Model Context Protocol (MCP)</strong> facilitates interaction between Oracle, Janus, and the Chimera Engine.</p>
 
-                <!-- Part V -->
-                <section id="part-5" class="article-section">
-                    <h2 class="text-2xl font-bold text-white mb-4">Part V: Operationalizing Pre-Emption</h2>
-                    <h3 class="text-xl text-sky-500 mb-4">The Predictive Kill Chain</h3>
-                    <p>
-                        The Petricorp-Chimera system attempts to break the cyber kill chain at Step 0.
-                    </p>
+                    <!-- Scenario A -->
+                    <div class="bg-slate-800/50 p-6 rounded-lg border border-slate-700 mb-8">
+                        <h3 class="text-lg font-bold text-teal-400 mb-4">Scenario A: Automated Viral Containment</h3>
+                        <p class="text-sm text-slate-400 mb-4">This workflow triggers when an AI-driven viral agent attempts to find a propagation path.</p>
+                        
+                        <div class="scenario-step">
+                            <div class="scenario-number">1</div>
+                            <h4 class="font-bold text-slate-200 text-sm">Detection & Ingress</h4>
+                            <p class="text-sm text-slate-400 mt-1">Chimera Engine detects a "High-Energy Excitation" (anomaly) on the graph.</p>
+                        </div>
 
-                    <div class="space-y-4 my-8">
-                        <div class="flex gap-4 items-start">
-                            <div class="bg-slate-700 text-sky-400 font-bold px-3 py-1 rounded">Phase 1</div>
-                            <div>
-                                <strong class="text-white">The Baseline (Quantum)</strong>
-                                <p class="text-sm mb-0">Physical D-Wave system calculates the "Ground State" Hamiltonian of normal operations.</p>
-                            </div>
+                        <div class="scenario-step">
+                            <div class="scenario-number">2</div>
+                            <h4 class="font-bold text-slate-200 text-sm">MCP Context Share</h4>
+                            <p class="text-sm text-slate-400 mt-1">The Engine publishes a Resource to the MCP bus: <span class="code-snippet">chimera://alerts/high_energy/node_7</span>.</p>
                         </div>
-                        <div class="flex gap-4 items-start">
-                            <div class="bg-slate-700 text-sky-400 font-bold px-3 py-1 rounded">Phase 2</div>
-                            <div>
-                                <strong class="text-white">The Watchtower (Simulation)</strong>
-                                <p class="text-sm mb-0">Edge GPUs monitor events. User accesses USB? Energy Spike detected.</p>
-                            </div>
+
+                        <div class="scenario-step">
+                            <div class="scenario-number">3</div>
+                            <h4 class="font-bold text-slate-200 text-sm">Simulation (Janus)</h4>
+                            <p class="text-sm text-slate-400 mt-1">Oracle queries Janus via an MCP Prompt to simulate the attack in a Digital Twin.</p>
                         </div>
-                        <div class="flex gap-4 items-start">
-                            <div class="bg-slate-700 text-sky-400 font-bold px-3 py-1 rounded">Phase 3</div>
-                            <div>
-                                <strong class="text-white">The Oracle (AI)</strong>
-                                <p class="text-sm mb-0">Janus AI analyzes context. Verdict: "High Probability of Malicious Intent."</p>
-                            </div>
+
+                        <div class="scenario-step">
+                            <div class="scenario-number">4</div>
+                            <h4 class="font-bold text-slate-200 text-sm">Inference</h4>
+                            <p class="text-sm text-slate-400 mt-1">Janus uses Quantum Bayesian Inference to predict the attacker's intent and next likely pivot.</p>
                         </div>
-                        <div class="flex gap-4 items-start">
-                            <div class="bg-slate-700 text-sky-400 font-bold px-3 py-1 rounded">Phase 4</div>
-                            <div>
-                                <strong class="text-white">The Guillotine (Petricorp)</strong>
-                                <p class="text-sm mb-0">Command sent to SpiceDB: <code>Deny(User:Target)</code>. Access revoked in milliseconds.</p>
-                            </div>
+
+                        <div class="scenario-step">
+                            <div class="scenario-number">5</div>
+                            <h4 class="font-bold text-slate-200 text-sm">Execution (Oracle)</h4>
+                            <p class="text-sm text-slate-400 mt-1">Oracle calls the MCP Tool <span class="code-snippet">isolate_host</span> for the affected atomic unit and triggers a "Re-puffing" event for surrounding serverless functions.</p>
                         </div>
                     </div>
-                </section>
 
-                <!-- Part VI -->
-                <section id="part-6" class="article-section">
-                    <h2 class="text-2xl font-bold text-white mb-4">Part VI: Threat Landscape</h2>
-                    <h3 class="text-xl text-sky-500 mb-4">Autonomous AI vs. Quantum Defense</h3>
-                    <p>
-                        The deployment of Chimera is a direct response to the rise of Autonomous Adversaries. Human defenders cannot fight AI attackers; the reaction time is too slow.
-                    </p>
-                    <p>
-                        <strong>Post-Quantum Cryptography (PQC):</strong> By relying on behavioral analysis (Energy Landscapes) rather than just cryptographic signatures, Chimera provides a defense robust even in a post-quantum world. Even if traffic is decrypted, the behavior triggers the energy alarms.
-                    </p>
+                    <!-- Scenario B -->
+                    <div class="bg-slate-800/50 p-6 rounded-lg border border-slate-700">
+                        <h3 class="text-lg font-bold text-teal-400 mb-4">Scenario B: Quantum Harvest-and-Decrypt Defense</h3>
+                        <p class="text-sm text-slate-400 mb-4">This workflow addresses adversaries collecting encrypted data for future quantum decryption.</p>
+                        
+                        <div class="scenario-step">
+                            <div class="scenario-number">1</div>
+                            <h4 class="font-bold text-slate-200 text-sm">Harvest Detection</h4>
+                            <p class="text-sm text-slate-400 mt-1">Janus identifies "Low-and-Slow" exfiltration patterns via agent-based modeling.</p>
+                        </div>
+
+                        <div class="scenario-step">
+                            <div class="scenario-number">2</div>
+                            <h4 class="font-bold text-slate-200 text-sm">Strategic Mutation</h4>
+                            <p class="text-sm text-slate-400 mt-1">Oracle initiates a <strong>Polymorphic Encryption</strong> strategy, rotating keys every few seconds.</p>
+                        </div>
+
+                        <div class="scenario-step">
+                            <div class="scenario-number">3</div>
+                            <h4 class="font-bold text-slate-200 text-sm">Multi-Path Atomization</h4>
+                            <p class="text-sm text-slate-400 mt-1">Oracle shards the data stream and routes it across diverse ISPs and satellite links.</p>
+                        </div>
+
+                        <div class="scenario-step">
+                            <div class="scenario-number">4</div>
+                            <h4 class="font-bold text-slate-200 text-sm">Verification</h4>
+                            <p class="text-sm text-slate-400 mt-1">The Chimera Engine verifies that no single capture point contains enough "shards" to reconstruct the original data, even with infinite compute.</p>
+                        </div>
+                    </div>
+
                 </section>
 
                 <!-- Appendix -->
                 <section id="appendix" class="article-section">
-                    <h2 class="text-2xl font-bold text-white mb-4">Appendix: Technical Specifications</h2>
+                    <h2 class="text-2xl font-bold text-white mb-4">6. Technical Review</h2>
                     
-                    <h4 class="font-bold text-slate-300 mt-6">Table 1: Technology Stack Components</h4>
+                    <h4 class="font-bold text-slate-300 mt-6 mb-4">Summary Table: Classical Defense vs. Chimera Protocol</h4>
+                    
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Component</th>
-                                <th>Technology</th>
-                                <th>Function</th>
+                                <th>Metric</th>
+                                <th>Classical Defense</th>
+                                <th class="text-sky-400 font-bold bg-slate-800/50">Chimera Protocol</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Authorization Engine</td>
-                                <td>SpiceDB (Petricorp)</td>
-                                <td>ReBAC, Graph Traversal</td>
+                                <td><strong>Search Space</strong></td>
+                                <td>Limited by CPU/Linear logic</td>
+                                <td class="text-sky-300">Exponential via Quantum Tunneling</td>
                             </tr>
                             <tr>
-                                <td>Optimization Topology</td>
-                                <td>Chimera Graph</td>
-                                <td>Bipartite Lattice, Quantum Annealing</td>
+                                <td><strong>Response Time</strong></td>
+                                <td>Reactive (Minutes/Hours)</td>
+                                <td class="text-sky-300">Predictive (Milliseconds)</td>
                             </tr>
                             <tr>
-                                <td>Processing (Edge)</td>
-                                <td>Simulated Qubits</td>
-                                <td>Simulated Bifurcation, GPU</td>
+                                <td><strong>Visibility</strong></td>
+                                <td>Static Perimeter Logs</td>
+                                <td class="text-sky-300">Living Knowledge Graph via MCP</td>
                             </tr>
                             <tr>
-                                <td>Processing (Core)</td>
-                                <td>Physical Qubits</td>
-                                <td>D-Wave Quantum Annealer</td>
-                            </tr>
-                            <tr>
-                                <td>Intelligence</td>
-                                <td>Chimera AI (Janus)</td>
-                                <td>LLM Agents, Synthetic Data</td>
+                                <td><strong>Asset Value</strong></td>
+                                <td>High (Cleartext/Static)</td>
+                                <td class="text-sky-300">Zero (Tokenized/Ephemeral)</td>
                             </tr>
                         </tbody>
                     </table>
+
+                    <div class="mt-8 text-center">
+                        <p class="text-sm text-slate-400 mb-4">For a detailed technical breakdown of the graph topology and agent logic:</p>
+                        <a href="Quantum AI Cybersecurity White Paper Outline.pdf" class="btn-pdf text-lg py-3 px-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            Download Full White Paper (PDF)
+                        </a>
+                    </div>
                 </section>
 
             </main>
@@ -559,12 +597,12 @@
         // --- CONFIG ---
         const config = {
             colors: {
-                bg: 0x1e293b,
-                core: 0x0f172a,
-                coreWire: 0x38bdf8,
-                ring: 0x38bdf8,
-                particle: 0x2dd4bf,
-                threat: 0xef4444
+                bg: 0x000000,
+                core: 0x0ea5e9,   // Sky Blue
+                oracle: 0xfbbf24,  // Amber
+                janus: 0x6366f1,    // Indigo
+                threat: 0xef4444,   // Red
+                dataToken: 0x10b981 // Emerald
             }
         };
 
@@ -574,159 +612,394 @@
             mouseY: 0
         };
 
-        // --- 3D ENGINE ---
+        // --- 3D ENGINE (DALA STYLE) ---
         const init3D = () => {
             const container = document.getElementById('three-canvas');
             const scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x020617, 0.02);
+            scene.fog = new THREE.FogExp2(0x0f172a, 0.03); // Fog for depth
 
-            // Camera
-            const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(0, 5, 20);
-            camera.lookAt(0, 0, 0);
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 30;
 
-            // Renderer
             const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(container.clientWidth, container.clientHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             container.appendChild(renderer.domElement);
 
-            // --- OBJECTS ---
-            // 1. CHIMERA LATTICE (Floor)
-            const gridHelper = new THREE.GridHelper(100, 50, 0x1e293b, 0x0f172a);
-            gridHelper.position.y = -5;
-            scene.add(gridHelper);
+            // --- PARTICLE SYSTEMS ---
 
-            const planeGeo = new THREE.PlaneGeometry(100, 100, 32, 32);
-            const planeMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.1 });
-            const energyPlane = new THREE.Mesh(planeGeo, planeMat);
-            energyPlane.rotation.x = -Math.PI / 2;
-            energyPlane.position.y = -5;
-            scene.add(energyPlane);
+            // 1. CHIMERA CORE (Dense Sphere of Particles)
+            const coreGeo = new THREE.BufferGeometry();
+            const coreCount = 2000;
+            const corePos = [];
+            for(let i=0; i<coreCount; i++) {
+                // Sphere coordinates
+                const phi = Math.acos(-1 + (2 * i) / coreCount);
+                const theta = Math.sqrt(coreCount * Math.PI) * phi;
+                const r = 2.5;
+                corePos.push(
+                    r * Math.cos(theta) * Math.sin(phi),
+                    r * Math.sin(theta) * Math.sin(phi),
+                    r * Math.cos(phi)
+                );
+            }
+            coreGeo.setAttribute('position', new THREE.Float32BufferAttribute(corePos, 3));
+            const coreMat = new THREE.PointsMaterial({ 
+                color: config.colors.core, 
+                size: 0.08, 
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            const coreSystem = new THREE.Points(coreGeo, coreMat);
+            scene.add(coreSystem);
 
-            // 2. THE CORE
-            const coreGroup = new THREE.Group();
-            const coreGeo = new THREE.IcosahedronGeometry(2, 1);
-            const coreMat = new THREE.MeshBasicMaterial({ color: config.core, wireframe: false });
-            const coreWireMat = new THREE.MeshBasicMaterial({ color: config.coreWire, wireframe: true, transparent: true, opacity: 0.3 });
-            const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-            const coreWire = new THREE.Mesh(coreGeo, coreWireMat);
-            coreGroup.add(coreMesh);
-            coreGroup.add(coreWire);
-            scene.add(coreGroup);
 
-            // 3. JANUS RINGS
-            const ringGroup = new THREE.Group();
-            const ringGeo = new THREE.TorusGeometry(4, 0.05, 16, 100);
-            const ringMat = new THREE.MeshBasicMaterial({ color: config.ring, transparent: true, opacity: 0.5 });
-            const ring1 = new THREE.Mesh(ringGeo, ringMat);
-            const ring2 = new THREE.Mesh(ringGeo, ringMat);
-            const ring3 = new THREE.Mesh(ringGeo, ringMat);
-            ring1.rotation.x = Math.PI / 2;
-            ring2.rotation.x = Math.PI / 2;
-            ring2.rotation.y = Math.PI / 4;
-            ring3.scale.set(1.2, 1.2, 1.2);
-            ring3.rotation.x = Math.PI / 1.8;
-            ringGroup.add(ring1, ring2, ring3);
-            scene.add(ringGroup);
+            // 2. ORACLE (Scanning Ring of Light)
+            const oracleGeo = new THREE.BufferGeometry();
+            const oracleCount = 200;
+            const oraclePos = [];
+            const oracleBasePos = []; // Store for animation
+            const radiusOracle = 6;
+            for(let i=0; i<oracleCount; i++) {
+                const angle = (i / oracleCount) * Math.PI * 2;
+                const x = Math.cos(angle) * radiusOracle;
+                const z = Math.sin(angle) * radiusOracle;
+                oraclePos.push(x, 6, z); // Start at Y=6
+                oracleBasePos.push(x, 6, z);
+            }
+            oracleGeo.setAttribute('position', new THREE.Float32BufferAttribute(oraclePos, 3));
+            const oracleMat = new THREE.PointsMaterial({ 
+                color: config.colors.oracle, 
+                size: 0.15, 
+                transparent: true,
+                opacity: 0.9,
+                blending: THREE.AdditiveBlending
+            });
+            const oracleSystem = new THREE.Points(oracleGeo, oracleMat);
+            scene.add(oracleSystem);
 
-            // 4. PARTICLES
-            const pCount = 500;
-            const pGeo = new THREE.BufferGeometry();
-            const pPos = new Float32Array(pCount * 3);
-            for(let i=0; i<pCount*3; i++) { pPos[i] = (Math.random() - 0.5) * 30; }
-            pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-            const pMat = new THREE.PointsMaterial({ size: 0.1, color: config.particle, transparent: true, opacity: 0.6 });
-            const particles = new THREE.Points(pGeo, pMat);
-            scene.add(particles);
 
-            // 5. THREAT
-            const threatGroup = new THREE.Group();
-            const threatGeo = new THREE.OctahedronGeometry(1, 0);
-            const threatMat = new THREE.MeshBasicMaterial({ color: config.threat, wireframe: true });
-            const threatMesh = new THREE.Mesh(threatGeo, threatMat);
-            threatGroup.add(threatMesh);
-            threatGroup.position.set(-30, 0, 0); // Offscreen
-            scene.add(threatGroup);
+            // 3. JANUS (Toroidal Particle Flow)
+            // Create a torus knot geometry but extract positions
+            const torusKnotGeo = new THREE.TorusKnotGeometry(4.5, 1.2, 100, 16);
+            const torusKnotPos = torusKnotGeo.attributes.position.array;
+            const janusGeo = new THREE.BufferGeometry();
+            janusGeo.setAttribute('position', new THREE.BufferAttribute(torusKnotPos, 3));
+            const janusMat = new THREE.PointsMaterial({ 
+                color: config.colors.janus, 
+                size: 0.1, 
+                transparent: true, 
+                opacity: 0.4,
+                blending: THREE.AdditiveBlending
+            });
+            const janusSystem = new THREE.Points(janusGeo, janusMat);
+            scene.add(janusSystem);
 
-            // --- ANIMATION ---
-            const clock = new THREE.Clock();
+
+            // 4. PERIMETER (Nebula of particles)
+            const perimeterGeo = new THREE.BufferGeometry();
+            const perimeterCount = 1500;
+            const perimeterPos = [];
+            const perimeterBasePos = [];
+            const radiusPerimeter = 18;
+            for(let i=0; i<perimeterCount; i++) {
+                const phi = Math.acos(-1 + (2 * i) / perimeterCount);
+                const theta = Math.sqrt(perimeterCount * Math.PI) * phi;
+                const x = radiusPerimeter * Math.cos(theta) * Math.sin(phi);
+                const y = radiusPerimeter * Math.sin(theta) * Math.sin(phi);
+                const z = radiusPerimeter * Math.cos(phi);
+                perimeterPos.push(x,y,z);
+                perimeterBasePos.push(x,y,z);
+            }
+            perimeterGeo.setAttribute('position', new THREE.Float32BufferAttribute(perimeterPos, 3));
+            const perimeterMat = new THREE.PointsMaterial({ 
+                color: 0x334155, // Dark slate
+                size: 0.1, 
+                transparent: true, 
+                opacity: 0.3
+            });
+            const perimeterSystem = new THREE.Points(perimeterGeo, perimeterMat);
+            scene.add(perimeterSystem);
+
+
+            // 5. ATTACK SWARM (Hidden initially)
+            const attackGeo = new THREE.BufferGeometry();
+            const attackCount = 200;
+            const attackPos = new Float32Array(attackCount * 3).fill(0); // All at center initially
+            attackGeo.setAttribute('position', new THREE.BufferAttribute(attackPos, 3));
+            const attackMat = new THREE.PointsMaterial({ 
+                color: config.colors.threat, 
+                size: 0.15, 
+                transparent: true, 
+                opacity: 0,
+                blending: THREE.AdditiveBlending
+            });
+            const attackSystem = new THREE.Points(attackGeo, attackMat);
+            scene.add(attackSystem);
+
+
+            // 6. ENCAPSULATION FIELD (Janus Shield - Green/Blue Bubble)
+            const shieldGeo = new THREE.IcosahedronGeometry(3, 2);
+            const shieldCount = shieldGeo.attributes.position.count;
+            // Expand sphere
+            const shieldGeoExpanded = new THREE.BufferGeometry();
+            const shieldPos = shieldGeo.attributes.position.array;
+            shieldGeoExpanded.setAttribute('position', new THREE.BufferAttribute(shieldPos, 3));
+            
+            const shieldMat = new THREE.PointsMaterial({ 
+                color: 0x38bdf8, 
+                size: 0.1, 
+                transparent: true, 
+                opacity: 0,
+                blending: THREE.AdditiveBlending
+            });
+            const shieldSystem = new THREE.Points(shieldGeoExpanded, shieldMat);
+            scene.add(shieldSystem);
+
+
+            // 7. DATA STREAM (Oracle to Core)
+            const streamGeo = new THREE.BufferGeometry();
+            const streamCount = 100;
+            const streamPos = [];
+            for(let i=0; i<streamCount; i++) {
+                streamPos.push((Math.random()-0.5)*2, Math.random()*6, (Math.random()-0.5)*2);
+            }
+            streamGeo.setAttribute('position', new THREE.Float32BufferAttribute(streamPos, 3));
+            const streamMat = new THREE.PointsMaterial({ 
+                color: config.colors.dataToken, 
+                size: 0.15, 
+                transparent: true, 
+                opacity: 0,
+                blending: THREE.AdditiveBlending
+            });
+            const streamSystem = new THREE.Points(streamGeo, streamMat);
+            scene.add(streamSystem);
+
+
+            // --- INTERACTION ---
             window.addEventListener('mousemove', (e) => {
                 const rect = container.getBoundingClientRect();
                 state.mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
                 state.mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
             });
 
+            // Simulation State
+            let attackParticles = [];
+            
+            document.getElementById('btn-trigger').addEventListener('click', () => {
+                if(state.phase !== 'IDLE') return;
+                state.phase = 'ATTACK';
+                addLog("Oracle: Viral Anomaly Detected.");
+                
+                // Initialize Attack Swarm at perimeter
+                attackParticles = [];
+                for(let i=0; i<attackCount; i++) {
+                    const idx = Math.floor(Math.random() * perimeterCount);
+                    // Spawn at random perimeter particle position
+                    attackParticles.push({
+                        x: perimeterBasePos[idx*3],
+                        y: perimeterBasePos[idx*3+1],
+                        z: perimeterBasePos[idx*3+2],
+                        vx: 0, vy: 0, vz: 0,
+                        active: true
+                    });
+                }
+                attackMat.opacity = 1;
+                document.getElementById('label-attack').classList.add('visible');
+            });
+
+            const clock = new THREE.Clock();
+
             function animate() {
                 requestAnimationFrame(animate);
                 const time = clock.getElapsedTime();
 
-                // Parallax
-                camera.position.x += (state.mouseX * 5 - camera.position.x) * 0.05;
-                camera.position.y += (state.mouseY * 2 + 5 - camera.position.y) * 0.05;
-                camera.lookAt(0, 0, 0);
-                ringGroup.rotation.x += (state.mouseY * 0.2 - ringGroup.rotation.x) * 0.02;
-                ringGroup.rotation.y += (state.mouseX * 0.5 - ringGroup.rotation.y) * 0.02;
+                // 1. Smooth Camera Parallax
+                camera.position.x += (state.mouseX * 5 - camera.position.x) * 0.02;
+                camera.position.y += (state.mouseY * 5 + 5 - camera.position.y) * 0.02;
+                camera.lookAt(0, 3, 0);
 
-                // Rotations
-                coreGroup.rotation.y += 0.01;
-                coreWire.rotation.z -= 0.01;
-                ring1.rotation.z += 0.01;
-                ring2.rotation.z -= 0.015;
-                ring3.rotation.x = Math.sin(time) * 0.2;
-
-                // Energy Ripple
-                const positions = energyPlane.geometry.attributes.position;
-                for(let i=0; i<positions.count; i++) {
-                    const x = positions.getX(i);
-                    const y = positions.getY(i);
-                    positions.setZ(i, Math.sin(Math.sqrt(x*x + y*y) * 0.5 + time * 2) * 0.5);
+                // 2. Animate Core (Pulse)
+                const positions = coreSystem.geometry.attributes.position.array;
+                for(let i=0; i<coreCount; i++) {
+                    // Gentle wobble
+                    const x = positions[i*3];
+                    const y = positions[i*3+1];
+                    const z = positions[i*3+2];
+                    
+                    // Normalize
+                    const len = Math.sqrt(x*x+y*y+z*z);
+                    const noise = Math.sin(time * 2 + x * 2) * 0.05;
+                    
+                    positions[i*3] = x/len * (2.5 + noise);
+                    positions[i*3+1] = y/len * (2.5 + noise);
+                    positions[i*3+2] = z/len * (2.5 + noise);
                 }
-                positions.needsUpdate = true;
+                coreSystem.geometry.attributes.position.needsUpdate = true;
+                coreSystem.rotation.y = time * 0.1;
+                coreSystem.rotation.z = time * 0.05;
 
-                // Threat Logic
-                if(state.phase === 'ACTIVE') {
-                    threatGroup.position.x += (0 - threatGroup.position.x) * 0.05;
-                    threatGroup.rotation.x += 0.1;
-                    if(Math.abs(threatGroup.position.x) < 1) {
-                        coreWire.scale.setScalar(1.5 + Math.sin(time*10)*0.1);
-                        ringGroup.scale.setScalar(0.8);
-                        document.getElementById('label-threat').classList.add('visible');
-                    } else {
-                        document.getElementById('label-threat').classList.remove('visible');
+                // 3. Animate Oracle (Floating Ring)
+                const oPos = oracleSystem.geometry.attributes.position.array;
+                for(let i=0; i<oracleCount; i++) {
+                    const baseX = oracleBasePos[i*3];
+                    const baseZ = oracleBasePos[i*3+2];
+                    
+                    // Sine wave floating
+                    oPos[i*3] = baseX + Math.sin(time + i) * 0.2;
+                    oPos[i*3+1] = 6 + Math.cos(time * 0.5 + i * 0.1) * 0.5; // Y bobbing
+                    oPos[i*3+2] = baseZ + Math.cos(time + i) * 0.2;
+                }
+                oracleSystem.geometry.attributes.position.needsUpdate = true;
+                oracleSystem.rotation.z = -time * 0.1; // Spin opposite to core
+
+                // 4. Animate Janus (Slow rotating torus)
+                janusSystem.rotation.x = time * 0.2;
+                janusSystem.rotation.y = time * 0.3;
+
+                // 5. Perimeter Drift
+                const pPos = perimeterSystem.geometry.attributes.position.array;
+                for(let i=0; i<perimeterCount; i++) {
+                    const bx = perimeterBasePos[i*3];
+                    const by = perimeterBasePos[i*3+1];
+                    const bz = perimeterBasePos[i*3+2];
+                    pPos[i*3] = bx + Math.sin(time * 0.5 + i) * 0.5;
+                    pPos[i*3+1] = by + Math.cos(time * 0.3 + i) * 0.5;
+                    pPos[i*3+2] = bz + Math.sin(time * 0.4 + i) * 0.5;
+                }
+                perimeterSystem.geometry.attributes.position.needsUpdate = true;
+                perimeterSystem.rotation.y = time * 0.02;
+
+                // 6. Attack Logic (Particle Swarm)
+                if(state.phase === 'ATTACK') {
+                    const aPos = attackSystem.geometry.attributes.position.array;
+                    
+                    let allCentered = true;
+                    let activeCount = 0;
+
+                    attackParticles.forEach((p, idx) => {
+                        if(!p.active) return;
+                        activeCount++;
+                        
+                        // Move towards center (0,0,0)
+                        const dx = -p.x;
+                        const dy = -p.y; // Move to Y=0
+                        const dz = -p.z;
+                        
+                        // Normalize and scale speed
+                        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                        
+                        // Phase: Incoming
+                        if (dist > 4) {
+                            const speed = 0.15;
+                            p.x += (dx/dist) * speed;
+                            p.y += (dy/dist) * speed;
+                            p.z += (dz/dist) * speed;
+                        } 
+                        // Phase: Encapsulated (stuck in middle)
+                        else {
+                            p.x += Math.sin(time*10 + idx)*0.05; // Jitter
+                            p.y += Math.cos(time*10 + idx)*0.05;
+                            p.z += Math.sin(time*10 + idx)*0.05;
+                        }
+
+                        aPos[idx*3] = p.x;
+                        aPos[idx*3+1] = p.y;
+                        aPos[idx*3+2] = p.z;
+                    });
+
+                    attackSystem.geometry.attributes.position.needsUpdate = true;
+
+                    // Trigger Shield when swarm is tight
+                    if(activeCount > 0 && attackParticles[0].x < 5 && attackParticles[0].x > -5 && shieldMat.opacity === 0) {
+                         addLog("Janus: Deploying Inference Bubble.");
+                         shieldMat.opacity = 0.6;
+                         shieldSystem.scale.setScalar(1.0);
+                         setTimeout(() => {
+                             state.phase = 'TOKENIZED';
+                             attackMat.opacity = 0;
+                             streamMat.opacity = 0.8; // Turn on data stream
+                             addLog("Oracle: Data Extracted via MCP.");
+                             shieldMat.opacity *= 0.95; // Fade shield
+                         }, 2000);
                     }
                 }
+
+                // 7. Shield Animation
+                if(shieldMat.opacity > 0) {
+                    shieldSystem.rotation.y = time * 0.5;
+                    shieldSystem.rotation.z = time * 0.2;
+                    const scale = 1 + Math.sin(time*5)*0.1;
+                    shieldSystem.scale.setScalar(scale);
+                }
+
+                // 8. Data Stream Animation (Particles falling from Oracle to Core)
+                if(streamMat.opacity > 0) {
+                    const sPos = streamSystem.geometry.attributes.position.array;
+                    for(let i=0; i<streamCount; i++) {
+                        sPos[i*3+1] -= 0.1; // Fall down
+                        if(sPos[i*3+1] < 0) {
+                            sPos[i*3+1] = 6; // Reset to top (Oracle)
+                        }
+                    }
+                    streamSystem.geometry.attributes.position.needsUpdate = true;
+                    
+                    // Pulse core
+                    coreMat.size = 0.08 + Math.sin(time*10)*0.04;
+                } else {
+                    coreMat.size = 0.08;
+                }
+
+                // Reset Logic
+                if(state.phase === 'TOKENIZED' && streamMat.opacity <= 0) {
+                    state.phase = 'IDLE';
+                    addLog("System Stabilized.");
+                    document.getElementById('label-attack').classList.remove('visible');
+                    // Reset Attack positions
+                    const aPos = attackSystem.geometry.attributes.position.array;
+                    for(let i=0; i<attackCount*3; i++) aPos[i]=0;
+                    attackSystem.geometry.attributes.position.needsUpdate = true;
+                }
+
+                // Fade effects
+                if(state.phase !== 'IDLE' && streamMat.opacity < 0.8) {
+                    streamMat.opacity += 0.01;
+                }
+                if(shieldMat.opacity < 0.8 && shieldMat.opacity > 0) {
+                    shieldMat.opacity *= 0.99;
+                }
+
                 renderer.render(scene, camera);
                 updateLabels();
             }
 
-            // Labels Logic
+            // Labels
             const labels = [
-                { id: 'label-core', obj: coreGroup, offset: -100 },
-                { id: 'label-janus', obj: ringGroup, offset: 150 },
-                { id: 'label-threat', obj: threatGroup, offset: 50 }
+                { id: 'label-core', obj: coreSystem, offset: -100 },
+                { id: 'label-janus', obj: janusSystem, offset: 180 },
+                { id: 'label-oracle', obj: oracleSystem, offset: 120 },
+                { id: 'label-attack', obj: attackSystem, offset: 50 }
             ];
             function updateLabels() {
                 labels.forEach(l => {
                     const el = document.getElementById(l.id);
-                    if(!el.classList.contains('visible') && l.id !== 'label-core' && l.id !== 'label-janus') return;
-                    if(l.id === 'label-core' || l.id === 'label-janus') el.classList.add('visible');
+                    // Show Core/Janus/Oracle always, Attack only if active
+                    if(l.id === 'label-attack' && state.phase === 'IDLE') return;
+                    if(l.id !== 'label-attack') el.classList.add('visible');
+
                     const v = new THREE.Vector3();
                     v.setFromMatrixPosition(l.obj.matrixWorld);
                     v.project(camera);
                     const x = (v.x * .5 + .5) * container.clientWidth;
                     const y = (-(v.y * .5) + .5) * container.clientHeight;
-                    el.style.transform = `translate(${x}px, ${y - l.offset}px) translate(-50%, -50%)`;
+                    if(Math.abs(v.z) < 1) {
+                        el.style.transform = `translate(${x}px, ${y - l.offset}px) translate(-50%, -50%)`;
+                    }
                 });
             }
-            animate();
 
-            document.getElementById('btn-trigger').addEventListener('click', () => {
-                state.phase = 'ACTIVE';
-                threatGroup.position.x = -40;
-                addLog("Injecting Polymorphic Threat...");
-                setTimeout(() => addLog("Janus: Counter-Measure Deployed"), 2000);
-            });
+            animate();
         };
 
         function addLog(msg) {
@@ -734,149 +1007,131 @@
             const div = document.createElement('div');
             div.innerText = `> ${msg}`;
             el.appendChild(div);
+            el.scrollTop = el.scrollHeight;
         }
 
-        // --- CHARTS WITH "STRINGTUNE" PHYSICS ---
-        const initCharts = () => {
-            const ctx = document.getElementById('energyChart').getContext('2d');
+        // --- 4D TOPOLOGY PARTICLE SIMULATION (CHART REPLACEMENT) ---
+        const initTopologySimulation = () => {
+            const canvas = document.getElementById('topologyCanvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
 
-            // 1. Create 3D Depth Gradient
-            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, 'rgba(56, 189, 248, 0.5)'); // Sky Blue top
-            gradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)'); // Transparent bottom
+            function resize() {
+                const rect = canvas.parentElement.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                width = rect.width;
+                height = rect.height;
+            }
+            window.addEventListener('resize', resize);
+            resize();
 
-            // 2. Initial Data Setup
-            const numPoints = 40;
-            const labels = Array.from({length: numPoints}, (_, i) => i);
-            const initialData = Array.from({length: numPoints}, () => 10 + Math.random() * 5);
+            const particleCount = 200;
+            const particles = [];
+            let beamX = 0; 
 
-            // 3. Physics State (The "Fiddle" Mechanism)
-            // We store 'target' (where we want to be) and 'current' (where we actually are)
-            // We also store 'velocity' for spring physics.
-            const physicsState = {
-                target: [...initialData],
-                current: [...initialData],
-                velocity: new Array(numPoints).fill(0),
-                tension: 0.05,  // Spring stiffness
-                friction: 0.90, // Damping
-            };
+            class Particle {
+                constructor() {
+                    this.reset(true);
+                }
 
-            // 4. Initialize Chart
-            const energyChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Network Hamiltonian (Energy State)',
-                        data: physicsState.current,
-                        borderColor: '#38bdf8',
-                        backgroundColor: gradient,
-                        borderWidth: 3,
-                        pointRadius: 0, // Hide points for cleaner look
-                        pointHoverRadius: 6,
-                        fill: true,
-                        tension: 0.4, // Chart.js smooth curve
-                        
-                        // Add Glow Effect
-                        shadowBlur: 15,
-                        shadowColor: '#0ea5e9'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false, // Crucial: prevents stretching
-                    animation: false, // We handle animation manually via physics loop
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    plugins: {
-                        legend: { 
-                            display: false // Hide legend for cleaner sci-fi look
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                            titleColor: '#38bdf8',
-                            bodyColor: '#e2e8f0',
-                            borderColor: '#334155',
-                            borderWidth: 1,
-                            displayColors: false,
-                            callbacks: {
-                                label: function(context) {
-                                    return `Energy: ${context.parsed.y.toFixed(2)} TJ`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: { 
-                            min: 0,
-                            max: 100, // Fixed scale to prevent jumping
-                            grid: { 
-                                color: 'rgba(51, 65, 85, 0.5)',
-                                borderDash: [5, 5] // Dashed grid for depth
-                            },
-                            ticks: { color: '#64748b', font: { family: 'Courier New' } },
-                            border: { display: false }
-                        },
-                        x: { 
-                            display: false, // Hide X axis labels for minimalism
-                            grid: { display: false },
-                            border: { display: false }
+                reset(randomX = false) {
+                    this.x = randomX ? Math.random() * width : 0;
+                    this.baseY = height / 2 + (Math.random() - 0.5) * (height * 0.6);
+                    this.y = this.baseY;
+                    this.energy = Math.random();
+                    this.noise = (Math.random() - 0.5) * 20;
+                    this.z = Math.random() * 2 + 1; 
+                    this.state = 'CHAOTIC'; 
+                }
+
+                update(speed) {
+                    this.x += speed;
+                    const wave = Math.sin(this.x * 0.01 + Date.now() * 0.001) * 20;
+                    this.y = this.baseY + wave + this.noise;
+
+                    if (Math.abs(this.x - beamX) < 20) {
+                        if (this.energy > 0.3) {
+                            this.energy *= 0.9; 
+                            this.noise *= 0.9; 
+                            this.state = 'GROUND';
                         }
                     }
-                }
-            });
 
-            // 5. The Animation Loop (Stringtune Fiddle Logic)
-            function updateChartPhysics() {
-                // Shift Data Stream (Simulate time passing)
-                // Every 10 frames roughly, shift array
-                if (Math.random() > 0.9) {
-                    // Generate new value
-                    const baseEnergy = 20;
-                    const noise = (Math.random() - 0.5) * 10;
-                    
-                    // Occasional spike (anomaly)
-                    const spike = Math.random() > 0.95 ? Math.random() * 60 : 0;
-                    
-                    const newValue = baseEnergy + noise + spike;
-                    
-                    // Shift target array
-                    physicsState.target.shift();
-                    physicsState.target.push(newValue);
+                    if (this.x > width) {
+                        this.reset();
+                    }
                 }
 
-                // Apply Spring Physics to every point
-                for (let i = 0; i < numPoints; i++) {
-                    const target = physicsState.target[i];
-                    const current = physicsState.current[i];
-                    const vel = physicsState.velocity[i];
+                draw(ctx) {
+                    const alpha = 0.3 + (this.energy * 0.7);
+                    
+                    if (this.state === 'GROUND' || this.energy < 0.3) {
+                        ctx.fillStyle = `rgba(56, 189, 248, ${alpha})`; 
+                        ctx.shadowColor = '#38bdf8';
+                    } else {
+                        ctx.fillStyle = `rgba(239, 68, 68, ${alpha})`; 
+                        ctx.shadowColor = '#ef4444';
+                    }
 
-                    // Hooke's Law: F = -k * x
-                    const displacement = target - current;
-                    const springForce = displacement * physicsState.tension;
-
-                    // Update Velocity
-                    physicsState.velocity[i] = (vel + springForce) * physicsState.friction;
-
-                    // Update Position
-                    physicsState.current[i] += physicsState.velocity[i];
+                    ctx.shadowBlur = 10 * this.z;
+                    const size = 1.5 * this.z;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, size, 0, Math.PI * 2);
+                    ctx.fill();
                 }
-
-                // Update Chart
-                energyChart.update('none'); // 'none' mode prevents Chart.js internal animation lag
-
-                requestAnimationFrame(updateChartPhysics);
             }
 
-            // Start the loop
-            updateChartPhysics();
-        };
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+
+            function animate() {
+                ctx.fillStyle = '#020617'; 
+                ctx.fillRect(0, 0, width, height);
+
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for(let x=0; x<width; x+=40) { ctx.moveTo(x,0); ctx.lineTo(x,height); }
+                for(let y=0; y<height; y+=40) { ctx.moveTo(0,y); ctx.lineTo(width,y); }
+                ctx.stroke();
+
+                beamX += 2;
+                if (beamX > width) beamX = 0;
+                
+                const grad = ctx.createLinearGradient(beamX - 20, 0, beamX + 20, 0);
+                grad.addColorStop(0, 'rgba(251, 191, 36, 0)');
+                grad.addColorStop(0.5, 'rgba(251, 191, 36, 0.2)'); 
+                grad.addColorStop(1, 'rgba(251, 191, 36, 0)');
+                
+                ctx.fillStyle = grad;
+                ctx.fillRect(beamX - 20, 0, 40, height);
+                
+                ctx.fillStyle = '#fbbf24';
+                ctx.font = '10px Courier New';
+                ctx.fillText('ORACLE SCAN', beamX - 30, 20);
+
+                particles.forEach(p => {
+                    p.update(1.5);
+                    p.draw(ctx);
+                });
+
+                ctx.strokeStyle = 'rgba(56, 189, 248, 0.2)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, height/2);
+                ctx.lineTo(width, height/2);
+                ctx.stroke();
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             init3D();
-            initCharts();
+            initTopologySimulation();
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if(entry.isIntersecting) {
