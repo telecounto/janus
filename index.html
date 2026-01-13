@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PetriCorp: Chimera Protocol | White Paper Dossier</title>
+    <title>PetriCorp: Chimera Protocol | High Density Simulation</title>
     <!-- MathJax for LaTeX Rendering -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Three.js for the Header Simulation -->
+    <!-- Three.js for Header Simulation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
     <style>
@@ -40,7 +40,7 @@
             color: #94a3b8;
         }
 
-        /* --- 3D CANVAS --- */
+        /* --- 3D CANVAS (HEADER) --- */
         #canvas-wrapper {
             width: 100%;
             height: 90vh;
@@ -51,10 +51,29 @@
             border-bottom: 1px solid #1e293b;
         }
 
+        /* --- 4D TOPOLOGY CANVAS (HIGH DENSITY) --- */
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 450px; 
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 1px solid #334155;
+            background: #050505; /* Almost black for maximum contrast */
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.9);
+            cursor: crosshair;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
         /* --- HUD ELEMENTS --- */
         .hud-panel {
             backdrop-filter: blur(16px);
-            background: rgba(15, 23, 42, 0.6); /* Darker for contrast */
+            background: rgba(15, 23, 42, 0.6); 
             border: 1px solid rgba(56, 189, 248, 0.3);
             box-shadow: 0 8px 32px rgba(0,0,0,0.5);
             transition: all 0.3s ease;
@@ -195,24 +214,6 @@
             color: #f8fafc;
         }
 
-        /* Chart Wrapper */
-        .chart-wrapper {
-            position: relative;
-            width: 100%;
-            height: 400px;
-            border-radius: 0.5rem;
-            overflow: hidden;
-            border: 1px solid #334155;
-            background: #020617; 
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-        }
-        
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
         /* PDF Button */
         .btn-pdf {
             display: inline-flex;
@@ -278,7 +279,7 @@
                     <a href="#exec-summary" class="text-slate-400 hover:text-sky-400 transition-colors">Strategic Report</a>
                     <a href="#appendix" class="text-slate-400 hover:text-sky-400 transition-colors">Data</a>
                     <a href="Quantum AI Cybersecurity White Paper Outline.pdf" class="btn-pdf">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 1-2 2H5a2 2 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                         Download Paper
                     </a>
                 </div>
@@ -421,7 +422,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
                         <div class="bg-slate-800 p-4 rounded border border-amber-700/30">
                             <h5 class="font-bold text-amber-400 mb-2">Oracle (Governance)</h5>
-                            <p class="text-sm">Oracle acts as the Guardian Agent. It maintains the "ground truth" of the enterprise topology, enforces security mandates, and governs the Janus simulator. It solves the "Oracle Problem" by synchronizing the simulation environment with real-time telemetry.</p>
+                            <p class="text-sm">Oracle acts as Guardian Agent. It maintains the "ground truth" of the enterprise topology, enforces security mandates, and governs the Janus simulator. It solves the "Oracle Problem" by synchronizing the simulation environment with real-time telemetry.</p>
                         </div>
                         <div class="bg-slate-800 p-4 rounded border border-sky-700/30">
                             <h5 class="font-bold text-sky-400 mb-2">Janus (Simulation)</h5>
@@ -464,7 +465,7 @@
                     </p>
 
                     <p class="text-sm bg-slate-800 p-4 rounded border-l-4 border-sky-500">
-                        The engine uses <strong>Simulated Bifurcation (SB)</strong> to find configuration \( s \) that minimizes \( E(s) \) in milliseconds, effectively tunneling through local minima to find the true ground state of security.
+                        The engine uses <strong>Simulated Bifurcation (SB)</strong> to find the configuration \( s \) that minimizes \( E(s) \) in milliseconds, effectively tunneling through local minima to find the true ground state of security.
                     </p>
                 </section>
 
@@ -580,7 +581,7 @@
                     </table>
 
                     <div class="mt-8 text-center">
-                        <p class="text-sm text-slate-400 mb-4">For a detailed technical breakdown of the graph topology and agent logic:</p>
+                        <p class="text-sm text-slate-400 mb-4">For a detailed technical breakdown of graph topology and agent logic:</p>
                         <a href="Quantum AI Cybersecurity White Paper Outline.pdf" class="btn-pdf text-lg py-3 px-8">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                             Download Full White Paper (PDF)
@@ -612,11 +613,11 @@
             mouseY: 0
         };
 
-        // --- 3D ENGINE (DALA STYLE) ---
+        // --- 3D ENGINE (HEADER) ---
         const init3D = () => {
             const container = document.getElementById('three-canvas');
             const scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x0f172a, 0.03); // Fog for depth
+            scene.fog = new THREE.FogExp2(0x0f172a, 0.03); 
 
             const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
             camera.position.z = 30;
@@ -627,77 +628,45 @@
             container.appendChild(renderer.domElement);
 
             // --- PARTICLE SYSTEMS ---
-
-            // 1. CHIMERA CORE (Dense Sphere of Particles)
             const coreGeo = new THREE.BufferGeometry();
             const coreCount = 2000;
             const corePos = [];
             for(let i=0; i<coreCount; i++) {
-                // Sphere coordinates
                 const phi = Math.acos(-1 + (2 * i) / coreCount);
                 const theta = Math.sqrt(coreCount * Math.PI) * phi;
                 const r = 2.5;
-                corePos.push(
-                    r * Math.cos(theta) * Math.sin(phi),
-                    r * Math.sin(theta) * Math.sin(phi),
-                    r * Math.cos(phi)
-                );
+                corePos.push(r * Math.cos(theta) * Math.sin(phi), r * Math.sin(theta) * Math.sin(phi), r * Math.cos(phi));
             }
             coreGeo.setAttribute('position', new THREE.Float32BufferAttribute(corePos, 3));
-            const coreMat = new THREE.PointsMaterial({ 
-                color: config.colors.core, 
-                size: 0.08, 
-                transparent: true,
-                opacity: 0.8,
-                blending: THREE.AdditiveBlending
-            });
+            const coreMat = new THREE.PointsMaterial({ color: config.colors.core, size: 0.08, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
             const coreSystem = new THREE.Points(coreGeo, coreMat);
             scene.add(coreSystem);
 
-
-            // 2. ORACLE (Scanning Ring of Light)
             const oracleGeo = new THREE.BufferGeometry();
             const oracleCount = 200;
             const oraclePos = [];
-            const oracleBasePos = []; // Store for animation
+            const oracleBasePos = [];
             const radiusOracle = 6;
             for(let i=0; i<oracleCount; i++) {
                 const angle = (i / oracleCount) * Math.PI * 2;
                 const x = Math.cos(angle) * radiusOracle;
                 const z = Math.sin(angle) * radiusOracle;
-                oraclePos.push(x, 6, z); // Start at Y=6
+                oraclePos.push(x, 6, z); 
                 oracleBasePos.push(x, 6, z);
             }
             oracleGeo.setAttribute('position', new THREE.Float32BufferAttribute(oraclePos, 3));
-            const oracleMat = new THREE.PointsMaterial({ 
-                color: config.colors.oracle, 
-                size: 0.15, 
-                transparent: true,
-                opacity: 0.9,
-                blending: THREE.AdditiveBlending
-            });
+            const oracleMat = new THREE.PointsMaterial({ color: config.colors.oracle, size: 0.15, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending });
             const oracleSystem = new THREE.Points(oracleGeo, oracleMat);
             scene.add(oracleSystem);
 
-
-            // 3. JANUS (Toroidal Particle Flow)
-            // Create a torus knot geometry but extract positions
             const torusKnotGeo = new THREE.TorusKnotGeometry(4.5, 1.2, 100, 16);
             const torusKnotPos = torusKnotGeo.attributes.position.array;
             const janusGeo = new THREE.BufferGeometry();
             janusGeo.setAttribute('position', new THREE.BufferAttribute(torusKnotPos, 3));
-            const janusMat = new THREE.PointsMaterial({ 
-                color: config.colors.janus, 
-                size: 0.1, 
-                transparent: true, 
-                opacity: 0.4,
-                blending: THREE.AdditiveBlending
-            });
+            const janusMat = new THREE.PointsMaterial({ color: config.colors.janus, size: 0.1, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
             const janusSystem = new THREE.Points(janusGeo, janusMat);
             scene.add(janusSystem);
 
-
-            // 4. PERIMETER (Nebula of particles)
             const perimeterGeo = new THREE.BufferGeometry();
             const perimeterCount = 1500;
             const perimeterPos = [];
@@ -713,52 +682,26 @@
                 perimeterBasePos.push(x,y,z);
             }
             perimeterGeo.setAttribute('position', new THREE.Float32BufferAttribute(perimeterPos, 3));
-            const perimeterMat = new THREE.PointsMaterial({ 
-                color: 0x334155, // Dark slate
-                size: 0.1, 
-                transparent: true, 
-                opacity: 0.3
-            });
+            const perimeterMat = new THREE.PointsMaterial({ color: 0x334155, size: 0.1, transparent: true, opacity: 0.3 });
             const perimeterSystem = new THREE.Points(perimeterGeo, perimeterMat);
             scene.add(perimeterSystem);
 
-
-            // 5. ATTACK SWARM (Hidden initially)
             const attackGeo = new THREE.BufferGeometry();
             const attackCount = 200;
-            const attackPos = new Float32Array(attackCount * 3).fill(0); // All at center initially
+            const attackPos = new Float32Array(attackCount * 3).fill(0); 
             attackGeo.setAttribute('position', new THREE.BufferAttribute(attackPos, 3));
-            const attackMat = new THREE.PointsMaterial({ 
-                color: config.colors.threat, 
-                size: 0.15, 
-                transparent: true, 
-                opacity: 0,
-                blending: THREE.AdditiveBlending
-            });
+            const attackMat = new THREE.PointsMaterial({ color: config.colors.threat, size: 0.15, transparent: true, opacity: 0, blending: THREE.AdditiveBlending });
             const attackSystem = new THREE.Points(attackGeo, attackMat);
             scene.add(attackSystem);
 
-
-            // 6. ENCAPSULATION FIELD (Janus Shield - Green/Blue Bubble)
             const shieldGeo = new THREE.IcosahedronGeometry(3, 2);
-            const shieldCount = shieldGeo.attributes.position.count;
-            // Expand sphere
-            const shieldGeoExpanded = new THREE.BufferGeometry();
             const shieldPos = shieldGeo.attributes.position.array;
+            const shieldGeoExpanded = new THREE.BufferGeometry();
             shieldGeoExpanded.setAttribute('position', new THREE.BufferAttribute(shieldPos, 3));
-            
-            const shieldMat = new THREE.PointsMaterial({ 
-                color: 0x38bdf8, 
-                size: 0.1, 
-                transparent: true, 
-                opacity: 0,
-                blending: THREE.AdditiveBlending
-            });
+            const shieldMat = new THREE.PointsMaterial({ color: 0x38bdf8, size: 0.1, transparent: true, opacity: 0, blending: THREE.AdditiveBlending });
             const shieldSystem = new THREE.Points(shieldGeoExpanded, shieldMat);
             scene.add(shieldSystem);
 
-
-            // 7. DATA STREAM (Oracle to Core)
             const streamGeo = new THREE.BufferGeometry();
             const streamCount = 100;
             const streamPos = [];
@@ -766,37 +709,25 @@
                 streamPos.push((Math.random()-0.5)*2, Math.random()*6, (Math.random()-0.5)*2);
             }
             streamGeo.setAttribute('position', new THREE.Float32BufferAttribute(streamPos, 3));
-            const streamMat = new THREE.PointsMaterial({ 
-                color: config.colors.dataToken, 
-                size: 0.15, 
-                transparent: true, 
-                opacity: 0,
-                blending: THREE.AdditiveBlending
-            });
+            const streamMat = new THREE.PointsMaterial({ color: config.colors.dataToken, size: 0.15, transparent: true, opacity: 0, blending: THREE.AdditiveBlending });
             const streamSystem = new THREE.Points(streamGeo, streamMat);
             scene.add(streamSystem);
 
-
-            // --- INTERACTION ---
             window.addEventListener('mousemove', (e) => {
                 const rect = container.getBoundingClientRect();
                 state.mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
                 state.mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
             });
 
-            // Simulation State
             let attackParticles = [];
             
             document.getElementById('btn-trigger').addEventListener('click', () => {
                 if(state.phase !== 'IDLE') return;
                 state.phase = 'ATTACK';
                 addLog("Oracle: Viral Anomaly Detected.");
-                
-                // Initialize Attack Swarm at perimeter
                 attackParticles = [];
                 for(let i=0; i<attackCount; i++) {
                     const idx = Math.floor(Math.random() * perimeterCount);
-                    // Spawn at random perimeter particle position
                     attackParticles.push({
                         x: perimeterBasePos[idx*3],
                         y: perimeterBasePos[idx*3+1],
@@ -815,23 +746,17 @@
                 requestAnimationFrame(animate);
                 const time = clock.getElapsedTime();
 
-                // 1. Smooth Camera Parallax
                 camera.position.x += (state.mouseX * 5 - camera.position.x) * 0.02;
                 camera.position.y += (state.mouseY * 5 + 5 - camera.position.y) * 0.02;
                 camera.lookAt(0, 3, 0);
 
-                // 2. Animate Core (Pulse)
                 const positions = coreSystem.geometry.attributes.position.array;
                 for(let i=0; i<coreCount; i++) {
-                    // Gentle wobble
                     const x = positions[i*3];
                     const y = positions[i*3+1];
                     const z = positions[i*3+2];
-                    
-                    // Normalize
                     const len = Math.sqrt(x*x+y*y+z*z);
                     const noise = Math.sin(time * 2 + x * 2) * 0.05;
-                    
                     positions[i*3] = x/len * (2.5 + noise);
                     positions[i*3+1] = y/len * (2.5 + noise);
                     positions[i*3+2] = z/len * (2.5 + noise);
@@ -840,25 +765,19 @@
                 coreSystem.rotation.y = time * 0.1;
                 coreSystem.rotation.z = time * 0.05;
 
-                // 3. Animate Oracle (Floating Ring)
                 const oPos = oracleSystem.geometry.attributes.position.array;
                 for(let i=0; i<oracleCount; i++) {
                     const baseX = oracleBasePos[i*3];
                     const baseZ = oracleBasePos[i*3+2];
-                    
-                    // Sine wave floating
                     oPos[i*3] = baseX + Math.sin(time + i) * 0.2;
-                    oPos[i*3+1] = 6 + Math.cos(time * 0.5 + i * 0.1) * 0.5; // Y bobbing
+                    oPos[i*3+1] = 6 + Math.cos(time * 0.5 + i * 0.1) * 0.5; 
                     oPos[i*3+2] = baseZ + Math.cos(time + i) * 0.2;
                 }
                 oracleSystem.geometry.attributes.position.needsUpdate = true;
-                oracleSystem.rotation.z = -time * 0.1; // Spin opposite to core
-
-                // 4. Animate Janus (Slow rotating torus)
+                oracleSystem.rotation.z = -time * 0.1; 
                 janusSystem.rotation.x = time * 0.2;
                 janusSystem.rotation.y = time * 0.3;
 
-                // 5. Perimeter Drift
                 const pPos = perimeterSystem.geometry.attributes.position.array;
                 for(let i=0; i<perimeterCount; i++) {
                     const bx = perimeterBasePos[i*3];
@@ -871,7 +790,6 @@
                 perimeterSystem.geometry.attributes.position.needsUpdate = true;
                 perimeterSystem.rotation.y = time * 0.02;
 
-                // 6. Attack Logic (Particle Swarm)
                 if(state.phase === 'ATTACK') {
                     const aPos = attackSystem.geometry.attributes.position.array;
                     
@@ -882,24 +800,20 @@
                         if(!p.active) return;
                         activeCount++;
                         
-                        // Move towards center (0,0,0)
                         const dx = -p.x;
-                        const dy = -p.y; // Move to Y=0
+                        const dy = -p.y; 
                         const dz = -p.z;
                         
-                        // Normalize and scale speed
                         const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
                         
-                        // Phase: Incoming
                         if (dist > 4) {
                             const speed = 0.15;
                             p.x += (dx/dist) * speed;
                             p.y += (dy/dist) * speed;
                             p.z += (dz/dist) * speed;
                         } 
-                        // Phase: Encapsulated (stuck in middle)
                         else {
-                            p.x += Math.sin(time*10 + idx)*0.05; // Jitter
+                            p.x += Math.sin(time*10 + idx)*0.05; 
                             p.y += Math.cos(time*10 + idx)*0.05;
                             p.z += Math.sin(time*10 + idx)*0.05;
                         }
@@ -911,7 +825,6 @@
 
                     attackSystem.geometry.attributes.position.needsUpdate = true;
 
-                    // Trigger Shield when swarm is tight
                     if(activeCount > 0 && attackParticles[0].x < 5 && attackParticles[0].x > -5 && shieldMat.opacity === 0) {
                          addLog("Janus: Deploying Inference Bubble.");
                          shieldMat.opacity = 0.6;
@@ -919,14 +832,13 @@
                          setTimeout(() => {
                              state.phase = 'TOKENIZED';
                              attackMat.opacity = 0;
-                             streamMat.opacity = 0.8; // Turn on data stream
+                             streamMat.opacity = 0.8; 
                              addLog("Oracle: Data Extracted via MCP.");
-                             shieldMat.opacity *= 0.95; // Fade shield
+                             shieldMat.opacity *= 0.95; 
                          }, 2000);
                     }
                 }
 
-                // 7. Shield Animation
                 if(shieldMat.opacity > 0) {
                     shieldSystem.rotation.y = time * 0.5;
                     shieldSystem.rotation.z = time * 0.2;
@@ -934,35 +846,29 @@
                     shieldSystem.scale.setScalar(scale);
                 }
 
-                // 8. Data Stream Animation (Particles falling from Oracle to Core)
                 if(streamMat.opacity > 0) {
                     const sPos = streamSystem.geometry.attributes.position.array;
                     for(let i=0; i<streamCount; i++) {
-                        sPos[i*3+1] -= 0.1; // Fall down
+                        sPos[i*3+1] -= 0.1; 
                         if(sPos[i*3+1] < 0) {
-                            sPos[i*3+1] = 6; // Reset to top (Oracle)
+                            sPos[i*3+1] = 6; 
                         }
                     }
                     streamSystem.geometry.attributes.position.needsUpdate = true;
-                    
-                    // Pulse core
                     coreMat.size = 0.08 + Math.sin(time*10)*0.04;
                 } else {
                     coreMat.size = 0.08;
                 }
 
-                // Reset Logic
                 if(state.phase === 'TOKENIZED' && streamMat.opacity <= 0) {
                     state.phase = 'IDLE';
                     addLog("System Stabilized.");
                     document.getElementById('label-attack').classList.remove('visible');
-                    // Reset Attack positions
                     const aPos = attackSystem.geometry.attributes.position.array;
                     for(let i=0; i<attackCount*3; i++) aPos[i]=0;
                     attackSystem.geometry.attributes.position.needsUpdate = true;
                 }
 
-                // Fade effects
                 if(state.phase !== 'IDLE' && streamMat.opacity < 0.8) {
                     streamMat.opacity += 0.01;
                 }
@@ -974,7 +880,6 @@
                 updateLabels();
             }
 
-            // Labels
             const labels = [
                 { id: 'label-core', obj: coreSystem, offset: -100 },
                 { id: 'label-janus', obj: janusSystem, offset: 180 },
@@ -984,10 +889,8 @@
             function updateLabels() {
                 labels.forEach(l => {
                     const el = document.getElementById(l.id);
-                    // Show Core/Janus/Oracle always, Attack only if active
                     if(l.id === 'label-attack' && state.phase === 'IDLE') return;
                     if(l.id !== 'label-attack') el.classList.add('visible');
-
                     const v = new THREE.Vector3();
                     v.setFromMatrixPosition(l.obj.matrixWorld);
                     v.project(camera);
@@ -998,7 +901,6 @@
                     }
                 });
             }
-
             animate();
         };
 
@@ -1010,7 +912,7 @@
             el.scrollTop = el.scrollHeight;
         }
 
-        // --- 4D TOPOLOGY PARTICLE SIMULATION (CHART REPLACEMENT) ---
+        // --- 4D MASSIVE PARTICLE SIMULATION (YUICHIROHARAI STYLE) ---
         const initTopologySimulation = () => {
             const canvas = document.getElementById('topologyCanvas');
             const ctx = canvas.getContext('2d');
@@ -1026,104 +928,122 @@
             window.addEventListener('resize', resize);
             resize();
 
-            const particleCount = 200;
-            const particles = [];
-            let beamX = 0; 
-
-            class Particle {
-                constructor() {
-                    this.reset(true);
-                }
-
-                reset(randomX = false) {
-                    this.x = randomX ? Math.random() * width : 0;
-                    this.baseY = height / 2 + (Math.random() - 0.5) * (height * 0.6);
-                    this.y = this.baseY;
-                    this.energy = Math.random();
-                    this.noise = (Math.random() - 0.5) * 20;
-                    this.z = Math.random() * 2 + 1; 
-                    this.state = 'CHAOTIC'; 
-                }
-
-                update(speed) {
-                    this.x += speed;
-                    const wave = Math.sin(this.x * 0.01 + Date.now() * 0.001) * 20;
-                    this.y = this.baseY + wave + this.noise;
-
-                    if (Math.abs(this.x - beamX) < 20) {
-                        if (this.energy > 0.3) {
-                            this.energy *= 0.9; 
-                            this.noise *= 0.9; 
-                            this.state = 'GROUND';
-                        }
-                    }
-
-                    if (this.x > width) {
-                        this.reset();
-                    }
-                }
-
-                draw(ctx) {
-                    const alpha = 0.3 + (this.energy * 0.7);
-                    
-                    if (this.state === 'GROUND' || this.energy < 0.3) {
-                        ctx.fillStyle = `rgba(56, 189, 248, ${alpha})`; 
-                        ctx.shadowColor = '#38bdf8';
-                    } else {
-                        ctx.fillStyle = `rgba(239, 68, 68, ${alpha})`; 
-                        ctx.shadowColor = '#ef4444';
-                    }
-
-                    ctx.shadowBlur = 10 * this.z;
-                    const size = 1.5 * this.z;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
+            // --- HIGH DENSITY CONFIG ---
+            const PARTICLE_COUNT = 15000; // 15k Particles
+            const Z_LAYERS = 4;
+            
+            // Pre-allocate Typed Arrays for max performance (avoid GC)
+            const x = new Float32Array(PARTICLE_COUNT);
+            const y = new Float32Array(PARTICLE_COUNT);
+            const vx = new Float32Array(PARTICLE_COUNT);
+            const vy = new Float32Array(PARTICLE_COUNT);
+            const size = new Float32Array(PARTICLE_COUNT);
+            const energy = new Float32Array(PARTICLE_COUNT);
+            const z = new Float32Array(PARTICLE_COUNT);
+            
+            // Initialize Arrays
+            for(let i=0; i<PARTICLE_COUNT; i++) {
+                x[i] = Math.random() * width;
+                y[i] = Math.random() * height;
+                z[i] = Math.random(); // 0 (far/slow) to 1 (close/fast)
+                
+                vx[i] = (Math.random() - 0.5) * 0.5;
+                vy[i] = (Math.random() - 0.5) * 0.5;
+                
+                energy[i] = 0.5 + Math.random() * 0.5; // 0.0 to 1.0
+                size[i] = 1 + z[i] * 2;
             }
 
-            for (let i = 0; i < particleCount; i++) {
-                particles.push(new Particle());
-            }
+            let beamX = width / 2; 
+            let mouse = { x: -1000, y: -1000 };
+
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                mouse.x = e.clientX - rect.left;
+                mouse.y = e.clientY - rect.top;
+            });
+            canvas.addEventListener('mouseleave', () => {
+                mouse.x = -1000;
+                mouse.y = -1000;
+            });
 
             function animate() {
-                ctx.fillStyle = '#020617'; 
+                // Trail Effect (Essential for Flow/Density look)
+                // Draw a semi-transparent background rect to fade previous frame
+                ctx.fillStyle = 'rgba(5, 5, 5, 0.2)'; 
                 ctx.fillRect(0, 0, width, height);
 
-                ctx.strokeStyle = '#1e293b';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                for(let x=0; x<width; x+=40) { ctx.moveTo(x,0); ctx.lineTo(x,height); }
-                for(let y=0; y<height; y+=40) { ctx.moveTo(0,y); ctx.lineTo(width,y); }
-                ctx.stroke();
+                // Update Oracle Beam
+                beamX += 1;
+                if (beamX > width + 50) beamX = -50;
 
-                beamX += 2;
-                if (beamX > width) beamX = 0;
-                
-                const grad = ctx.createLinearGradient(beamX - 20, 0, beamX + 20, 0);
+                // Draw Oracle Beam
+                const grad = ctx.createLinearGradient(beamX - 25, 0, beamX + 25, 0);
                 grad.addColorStop(0, 'rgba(251, 191, 36, 0)');
-                grad.addColorStop(0.5, 'rgba(251, 191, 36, 0.2)'); 
+                grad.addColorStop(0.5, 'rgba(251, 191, 36, 0.15)'); 
                 grad.addColorStop(1, 'rgba(251, 191, 36, 0)');
-                
                 ctx.fillStyle = grad;
-                ctx.fillRect(beamX - 20, 0, 40, height);
+                ctx.fillRect(beamX - 25, 0, 50, height);
                 
-                ctx.fillStyle = '#fbbf24';
+                // Draw Oracle Label
+                ctx.fillStyle = 'rgba(251, 191, 36, 0.8)';
                 ctx.font = '10px Courier New';
-                ctx.fillText('ORACLE SCAN', beamX - 30, 20);
+                ctx.fillText('ORACLE SCAN', beamX - 35, 20);
 
-                particles.forEach(p => {
-                    p.update(1.5);
-                    p.draw(ctx);
-                });
+                // Update & Draw Particles (Optimized Loop)
+                for (let i = 0; i < PARTICLE_COUNT; i++) {
+                    
+                    // 1. Apply Oracle Interference (Viscous Drag)
+                    const distToBeam = Math.abs(x[i] - beamX);
+                    if (distToBeam < 25) {
+                        // Dampen velocity (friction)
+                        vx[i] *= 0.9; 
+                        vy[i] *= 0.9;
+                        
+                        // Decay Energy towards Ground State
+                        energy[i] = Math.max(0, energy[i] * 0.95);
+                    }
 
-                ctx.strokeStyle = 'rgba(56, 189, 248, 0.2)';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(0, height/2);
-                ctx.lineTo(width, height/2);
-                ctx.stroke();
+                    // 2. Mouse Turbulence (Attack Vector)
+                    const distToMouse = Math.hypot(x[i] - mouse.x, y[i] - mouse.y);
+                    if (distToMouse < 150) {
+                        const force = (150 - distToMouse) / 150;
+                        const angle = Math.atan2(y[i] - mouse.y, x[i] - mouse.x);
+                        
+                        vx[i] += Math.cos(angle) * force * 0.05;
+                        vy[i] += Math.sin(angle) * force * 0.05;
+                        
+                        // Interaction increases chaos (Energy)
+                        energy[i] = Math.min(1, energy[i] + 0.02);
+                    }
 
+                    // 3. Apply Physics & Update Position
+                    x[i] += vx[i];
+                    y[i] += vy[i];
+
+                    // 4. Boundary Wrap
+                    if (x[i] > width) x[i] = 0;
+                    if (x[i] < 0) x[i] = width;
+                    if (y[i] > height) y[i] = 0;
+                    if (y[i] < 0) y[i] = height;
+
+                    // 5. Draw Particle
+                    // Depth Effect: Scale based on Z (3D fly-through illusion)
+                    const depthSize = size[i];
+                    
+                    // Color: Map Energy to HSL
+                    // Low Energy (0.3) -> Blue/Green (Ground State)
+                    // High Energy (0.8+) -> Red/Purple (Chaos)
+                    const hue = 200 + (energy[i] * -50); 
+                    const alpha = 0.2 + (energy[i] * 0.5);
+                    
+                    ctx.fillStyle = `hsla(${hue}, 80%, 60%, ${alpha})`;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x[i], y[i], depthSize, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
                 requestAnimationFrame(animate);
             }
             animate();
