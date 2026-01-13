@@ -166,6 +166,22 @@
             background: #1e293b;
             color: #f8fafc;
         }
+
+        /* Chart specific container to prevent stretch */
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            /* Fixed height ensures it doesn't stretch vertically */
+            height: 300px;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 1px solid #334155;
+            background: #0f172a;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        @media (min-width: 768px) {
+            .chart-wrapper { height: 400px; }
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -328,9 +344,22 @@
                         Security is fundamentally an <strong>Optimization Problem</strong>. The goal is to find the network state that minimizes "Risk Energy." By mapping the network state onto a Chimera graph, the system uses quantum annealing to find the "Ground State" (Normal Behavior). Any deviation is an energy spike.
                     </p>
                     
+                    <!-- UPDATED CHART SECTION -->
                     <div class="my-8">
-                        <canvas id="energyChart" class="w-full h-72 bg-slate-800 rounded p-4 border border-slate-700"></canvas>
-                        <p class="text-xs text-center mt-2 text-slate-500">Fig 2.1: Anomaly Detection via Hamiltonian Energy Minimization</p>
+                        <div class="flex justify-between items-end mb-2">
+                            <h4 class="text-sm font-bold text-sky-500 uppercase tracking-widest">Fig 2.1: Hamiltonian Energy Minimization</h4>
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+                                <span class="text-[10px] font-mono text-teal-400">LIVE FEED</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Chart Container: Fixed height, relative positioning to stop stretch -->
+                        <div class="chart-wrapper">
+                            <canvas id="energyChart"></canvas>
+                        </div>
+                        
+                        <p class="text-xs text-center mt-2 text-slate-500">Real-time visualization of anomaly detection. Spikes indicate deviation from ground state.</p>
                     </div>
 
                     <p>
@@ -349,7 +378,7 @@
                         The system uses a hybrid model of physical qubits and <strong>Simulated Qubits</strong>. Physical quantum computers are too scarce for edge deployment. The solution is a tiered architecture.
                     </p>
                     
-                    <!-- NEW HYBRID ENGINE FIGURE -->
+                    <!-- HYBRID ENGINE FIGURE -->
                     <div class="my-8 bg-slate-800 p-6 rounded-lg border border-slate-700">
                         <h4 class="text-sm font-bold text-sky-500 uppercase tracking-widest mb-4">Fig 3.1: Hybrid Compute Topology</h4>
                         
@@ -707,44 +736,142 @@
             el.appendChild(div);
         }
 
-        // --- CHARTS ---
+        // --- CHARTS WITH "STRINGTUNE" PHYSICS ---
         const initCharts = () => {
             const ctx = document.getElementById('energyChart').getContext('2d');
-            new Chart(ctx, {
+
+            // 1. Create 3D Depth Gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(56, 189, 248, 0.5)'); // Sky Blue top
+            gradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)'); // Transparent bottom
+
+            // 2. Initial Data Setup
+            const numPoints = 40;
+            const labels = Array.from({length: numPoints}, (_, i) => i);
+            const initialData = Array.from({length: numPoints}, () => 10 + Math.random() * 5);
+
+            // 3. Physics State (The "Fiddle" Mechanism)
+            // We store 'target' (where we want to be) and 'current' (where we actually are)
+            // We also store 'velocity' for spring physics.
+            const physicsState = {
+                target: [...initialData],
+                current: [...initialData],
+                velocity: new Array(numPoints).fill(0),
+                tension: 0.05,  // Spring stiffness
+                friction: 0.90, // Damping
+            };
+
+            // 4. Initialize Chart
+            const energyChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['0ms', '10ms', '20ms', '30ms', '40ms', '50ms'],
+                    labels: labels,
                     datasets: [{
                         label: 'Network Hamiltonian (Energy State)',
-                        data: [12, 11, 13, 85, 15, 12],
+                        data: physicsState.current,
                         borderColor: '#38bdf8',
-                        backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        pointRadius: 0, // Hide points for cleaner look
+                        pointHoverRadius: 6,
                         fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#38bdf8'
+                        tension: 0.4, // Chart.js smooth curve
+                        
+                        // Add Glow Effect
+                        shadowBlur: 15,
+                        shadowColor: '#0ea5e9'
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { labels: { color: '#94a3b8' } },
-                        tooltip: { backgroundColor: '#1e293b', titleColor: '#38bdf8' }
+                    maintainAspectRatio: false, // Crucial: prevents stretching
+                    animation: false, // We handle animation manually via physics loop
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: { 
+                            display: false // Hide legend for cleaner sci-fi look
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleColor: '#38bdf8',
+                            bodyColor: '#e2e8f0',
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `Energy: ${context.parsed.y.toFixed(2)} TJ`;
+                                }
+                            }
+                        }
                     },
                     scales: {
                         y: { 
-                            grid: { color: '#334155' },
-                            ticks: { color: '#64748b' },
-                            title: { display: true, text: 'Energy (Joules)', color: '#475569' }
+                            min: 0,
+                            max: 100, // Fixed scale to prevent jumping
+                            grid: { 
+                                color: 'rgba(51, 65, 85, 0.5)',
+                                borderDash: [5, 5] // Dashed grid for depth
+                            },
+                            ticks: { color: '#64748b', font: { family: 'Courier New' } },
+                            border: { display: false }
                         },
                         x: { 
+                            display: false, // Hide X axis labels for minimalism
                             grid: { display: false },
-                            ticks: { color: '#64748b' }
+                            border: { display: false }
                         }
                     }
                 }
             });
+
+            // 5. The Animation Loop (Stringtune Fiddle Logic)
+            function updateChartPhysics() {
+                // Shift Data Stream (Simulate time passing)
+                // Every 10 frames roughly, shift array
+                if (Math.random() > 0.9) {
+                    // Generate new value
+                    const baseEnergy = 20;
+                    const noise = (Math.random() - 0.5) * 10;
+                    
+                    // Occasional spike (anomaly)
+                    const spike = Math.random() > 0.95 ? Math.random() * 60 : 0;
+                    
+                    const newValue = baseEnergy + noise + spike;
+                    
+                    // Shift target array
+                    physicsState.target.shift();
+                    physicsState.target.push(newValue);
+                }
+
+                // Apply Spring Physics to every point
+                for (let i = 0; i < numPoints; i++) {
+                    const target = physicsState.target[i];
+                    const current = physicsState.current[i];
+                    const vel = physicsState.velocity[i];
+
+                    // Hooke's Law: F = -k * x
+                    const displacement = target - current;
+                    const springForce = displacement * physicsState.tension;
+
+                    // Update Velocity
+                    physicsState.velocity[i] = (vel + springForce) * physicsState.friction;
+
+                    // Update Position
+                    physicsState.current[i] += physicsState.velocity[i];
+                }
+
+                // Update Chart
+                energyChart.update('none'); // 'none' mode prevents Chart.js internal animation lag
+
+                requestAnimationFrame(updateChartPhysics);
+            }
+
+            // Start the loop
+            updateChartPhysics();
         };
 
         document.addEventListener('DOMContentLoaded', () => {
