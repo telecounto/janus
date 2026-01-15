@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chimera Protocol: Active Defense</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #0a0a0a; font-family: 'Courier New', Courier, monospace; }
+        canvas { display: block; }
+        
+        /* UI Container Layer */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #ffffff;
+            mix-blend-mode: difference;
+        }
+
+        /* Top Left: System Status */
+        #system-status {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+        .header-title {
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .status-display {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Top Right: Statistics */
+        #stats {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            letter-spacing: 1px;
+        }
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Bottom Left: Protocol Narrative */
+        #manifesto {
+            position: absolute;
+            bottom: 40px;
+            left: 20px;
+            max-width: 400px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #ccc;
+            border-left: 2px solid #444;
+            padding-left: 15px;
+        }
+        .highlight {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* Bottom Center: Controls */
+        #instruction {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 10px;
+            left: 0;
+        }
+    </style>
+    <!-- Import Map to resolve 'three' dependencies -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="ui-layer">
+        <!-- Top Left -->
+        <div id="system-status">
+            <div class="header-title">CHIMERA PROTOCOL // V.4.0</div>
+            <div class="status-display" id="status-text">DEFENSIVE ORBIT</div>
+            <div style="font-size: 12px; margin-top: 5px; color: #666;">SCANNING ATTACK SURFACE...</div>
+        </div>
+
+        <!-- Top Right -->
+        <div id="stats">
+            <div class="stat-label">SECURED NODES (ATOMIZED)</div>
+            <div id="defender-count" class="stat-value">0</div>
+            <br>
+            <div class="stat-label">ADVERSARIAL THREATS</div>
+            <div id="attacker-count" style="font-size: 14px; color: #888;">0</div>
+        </div>
+
+        <!-- Bottom Left: Lore/Description -->
+        <div id="manifesto">
+            <p>
+                <span class="highlight">PROTOCOL ENGAGED:</span> The Chimera Protocol denies adversaries the static foothold they require by constantly <span class="highlight">evolving</span>, <span class="highlight">tokenizing</span>, and <span class="highlight">atomizing</span> the attack surface.
+            </p>
+            <p>
+                Network Status: <span class="highlight">LIVING // THINKING // FIGHTING</span>
+            </p>
+        </div>
+
+        <div id="instruction">AUTOMATIC SEQUENCE // [ MOUSE ] to Rotate View</div>
+    </div>
+
+    <!-- Import Three.js as a module using the import map -->
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // --- Configuration ---
+        const CONFIG = {
+            particleCount: 65000,
+            hypercubeScale: 2.5,
+            // Grayscale Palette
+            colorDefenders: new THREE.Color(0xffffff), // Pure White
+            colorAttackers: new THREE.Color(0x444444), // Dark Grey
+            assimilationRate: 800 // Particles converted per attack cycle
+        };
+
+        // --- Global Variables ---
+        let scene, camera, renderer, material, geometry, points;
+        let time = 0;
+        let state = {
+            aggression: 0,
+            targetAggression: 0,
+            previousTarget: 0,
+            defenders: 0,
+            attackers: 0
+        };
+
+        // --- 4D Math Utilities ---
+        function generateTesseractStructure() {
+            const vertices = [];
+            for(let i=0; i<16; i++) {
+                let x = (i & 1) ? 1 : -1;
+                let y = (i & 2) ? 1 : -1;
+                let z = (i & 4) ? 1 : -1;
+                let w = (i & 8) ? 1 : -1;
+                vertices.push({x, y, z, w});
+            }
+            const edges = [];
+            for(let i=0; i<vertices.length; i++) {
+                for(let j=i+1; j<vertices.length; j++) {
+                    let diff = 0;
+                    if(vertices[i].x !== vertices[j].x) diff++;
+                    if(vertices[i].y !== vertices[j].y) diff++;
+                    if(vertices[i].z !== vertices[j].z) diff++;
+                    if(vertices[i].w !== vertices[j].w) diff++;
+                    if(diff === 1) {
+                        edges.push([i, j]);
+                    }
+                }
+            }
+            return { vertices, edges };
+        }
+
+        const tesseractData = generateTesseractStructure();
+
+        // --- Shaders ---
+
+        const vertexShader = `
+            uniform float uTime;
+            uniform float uAggression; 
+            uniform float uScale;
+            uniform vec4 uRotation;
+            uniform vec3 uColorDef;
+            uniform vec3 uColorAtt;
+            
+            attribute vec4 aTarget4D; 
+            attribute vec3 aRandom;   
+            attribute float aRole;    
+            
+            varying vec3 vColor;
+            varying float vAlpha;
+
+            // --- Noise Functions ---
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+            vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+
+            float snoise(vec3 v) { 
+                const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
+                const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+                vec3 i  = floor(v + dot(v, C.yyy) );
+                vec3 x0 = v - i + dot(i, C.xxx) ;
+                vec3 g = step(x0.yzx, x0.xyz);
+                vec3 l = 1.0 - g;
+                vec3 i1 = min( g.xyz, l.zxy );
+                vec3 i2 = max( g.xyz, l.zxy );
+                vec3 x1 = x0 - i1 + C.xxx;
+                vec3 x2 = x0 - i2 + C.yyy; 
+                vec3 x3 = x0 - D.yyy;      
+                i = mod289(i); 
+                vec4 p = permute( permute( permute( 
+                            i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
+                          + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) 
+                          + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+                float n_ = 0.142857142857; 
+                vec3  ns = n_ * D.wyz - D.xzx;
+                vec4 j = p - 49.0 * floor(p * ns.z * ns.z); 
+                vec4 x_ = floor(j * ns.z);
+                vec4 y_ = floor(j - 7.0 * x_ );    
+                vec4 x = x_ *ns.x + ns.yyyy;
+                vec4 y = y_ *ns.x + ns.yyyy;
+                vec4 h = 1.0 - abs(x) - abs(y);
+                vec4 b0 = vec4( x.xy, y.xy );
+                vec4 b1 = vec4( x.zw, y.zw );
+                vec4 s0 = floor(b0)*2.0 + 1.0;
+                vec4 s1 = floor(b1)*2.0 + 1.0;
+                vec4 sh = -step(h, vec4(0.0));
+                vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
+                vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+                vec3 p0 = vec3(a0.xy,h.x);
+                vec3 p1 = vec3(a0.zw,h.y);
+                vec3 p2 = vec3(a1.xy,h.z);
+                vec3 p3 = vec3(a1.zw,h.w);
+                vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+                p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+                vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+                m = m * m;
+                return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+            }
+
+            vec3 curlNoise(vec3 p) {
+                const float e = 0.1;
+                vec3 dx = vec3(e, 0.0, 0.0);
+                vec3 dy = vec3(0.0, e, 0.0);
+                vec3 dz = vec3(0.0, 0.0, e);
+                vec3 p_x0 = snoise(p - dx) * vec3(1.0);
+                vec3 p_x1 = snoise(p + dx) * vec3(1.0);
+                vec3 p_y0 = snoise(p - dy) * vec3(1.0);
+                vec3 p_y1 = snoise(p + dy) * vec3(1.0);
+                vec3 p_z0 = snoise(p - dz) * vec3(1.0);
+                vec3 p_z1 = snoise(p + dz) * vec3(1.0);
+                float x = p_y1.z - p_y0.z - p_z1.y + p_z0.y;
+                float y = p_z1.x - p_z0.x - p_x1.z + p_x0.z;
+                float z = p_x1.y - p_x0.y - p_y1.x + p_y0.x;
+                return normalize(vec3(x, y, z));
+            }
+
+            // --- 4D Math ---
+            vec4 rotate4D(vec4 v, vec4 angles) {
+                float c, s, x, y, z, w;
+                // XW
+                c = cos(angles.x); s = sin(angles.x);
+                x = v.x * c - v.w * s; w = v.x * s + v.w * c; v.x = x; v.w = w;
+                // YW
+                c = cos(angles.y); s = sin(angles.y);
+                y = v.y * c - v.w * s; w = v.y * s + v.w * c; v.y = y; v.w = w;
+                // ZW
+                c = cos(angles.z); s = sin(angles.z);
+                z = v.z * c - v.w * s; w = v.z * s + v.w * c; v.z = z; v.w = w;
+                return v;
+            }
+
+            void main() {
+                vec3 finalPos;
+                float size = 1.0;
+                
+                // ==========================
+                // === ROLE: DEFENDER (Cube) ===
+                // ==========================
+                if (aRole > 0.5) {
+                    vec4 p4 = aTarget4D;
+
+                    // Faster rotation under attack
+                    vec4 rot = uRotation * (1.0 + uAggression * 2.0); 
+                    p4 = rotate4D(p4, rot);
+
+                    float distance = 4.0;
+                    float wFactor = 1.0 / (distance - p4.w);
+                    vec3 p3 = p4.xyz * wFactor * uScale;
+
+                    // Glitch effect on high aggression
+                    float shake = snoise(vec3(uTime * 20.0, p3.x, p3.y)) * uAggression * 0.2;
+                    p3 += normalize(p3) * shake;
+
+                    // Shield Pulse
+                    float shieldPulse = sin(uTime * 8.0 + p3.x * 2.0) * 0.1 * uAggression;
+                    p3 *= (1.0 + shieldPulse);
+
+                    finalPos = p3;
+                    
+                    // Flash White on Glitch
+                    float flash = smoothstep(0.8, 1.0, abs(shake) * 5.0);
+                    vColor = mix(uColorDef, vec3(1.0), flash + shieldPulse * 2.0);
+                    size = 2.0 + uAggression * 2.0; 
+                } 
+                
+                // ==========================
+                // === ROLE: ATTACKER (Swarm) ===
+                // ==========================
+                else {
+                    // 1. Orbital Mechanics
+                    float shellRadius = mix(6.0, 3.5, uAggression); 
+                    
+                    float orbitSpeed = 0.2 + uAggression * 1.5;
+                    float t = uTime * orbitSpeed;
+                    
+                    vec3 orbitOffset = aRandom * 50.0;
+                    vec3 rawPos = vec3(
+                        sin(t + orbitOffset.x) * shellRadius,
+                        cos(t * 0.9 + orbitOffset.y) * shellRadius,
+                        sin(t * 0.6 + orbitOffset.z) * shellRadius 
+                    );
+
+                    // 2. Attack "Lunge" Mechanics
+                    float cycle = uTime * 2.0 + aRandom.x * 20.0;
+                    float rawPhase = sin(cycle);
+                    
+                    // Sharpen the attack
+                    float attackStrength = smoothstep(0.5, 1.0, rawPhase) * uAggression;
+                    
+                    // Drill Effect
+                    vec3 attackVector = -rawPos; 
+                    vec3 spiral = cross(normalize(attackVector), vec3(0.0, 1.0, 0.0));
+                    
+                    vec3 attackPos = rawPos + (attackVector * 0.9 + spiral * 2.0) * attackStrength;
+
+                    // Chaos
+                    vec3 noisePos = rawPos * 0.3 + vec3(uTime * 0.8);
+                    vec3 curl = curlNoise(noisePos);
+                    
+                    attackPos += curl * (1.0 + uAggression * 2.0);
+
+                    finalPos = attackPos;
+
+                    // Visuals: Grayscale Heat
+                    // Striking turns them Bright White (vec3(1.0))
+                    float heat = attackStrength;
+                    vColor = mix(uColorAtt, vec3(1.0), heat); 
+                    size = mix(1.5, 4.0, heat);
+                }
+
+                vec4 mvPosition = modelViewMatrix * vec4(finalPos, 1.0);
+                gl_Position = projectionMatrix * mvPosition;
+
+                gl_PointSize = size * (20.0 / -mvPosition.z);
+                
+                vAlpha = 1.0;
+            }
+        `;
+
+        const fragmentShader = `
+            varying vec3 vColor;
+            varying float vAlpha;
+
+            void main() {
+                vec2 coord = gl_PointCoord - vec2(0.5);
+                float dist = length(coord);
+                if (dist > 0.5) discard;
+
+                float strength = 1.0 - smoothstep(0.0, 0.5, dist);
+                strength = pow(strength, 3.0); 
+                
+                gl_FragColor = vec4(vColor, vAlpha * strength);
+            }
+        `;
+
+        function init() {
+            const container = document.createElement('div');
+            document.body.appendChild(container);
+
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x0a0a0a, 0.02); // Dark grey fog
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 0, 12);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x0a0a0a); // Dark grey BG
+            container.appendChild(renderer.domElement);
+
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 1.0;
+
+            // --- Geometry Setup ---
+            geometry = new THREE.BufferGeometry();
+            
+            const positions = new Float32Array(CONFIG.particleCount * 3); 
+            const target4Ds = new Float32Array(CONFIG.particleCount * 4);
+            const randoms = new Float32Array(CONFIG.particleCount * 3);
+            const roles = new Float32Array(CONFIG.particleCount); 
+
+            // Initial Split: 20% Defenders, 80% Attackers
+            const defenderCount = Math.floor(CONFIG.particleCount * 0.2);
+            state.defenders = defenderCount;
+            state.attackers = CONFIG.particleCount - defenderCount;
+            
+            // 1. Generate Defenders (On Tesseract Edges)
+            const edgeCount = tesseractData.edges.length;
+            const particlesPerEdge = Math.ceil(defenderCount / edgeCount);
+            
+            let pIdx = 0;
+
+            // -- Defenders Loop --
+            for (let e = 0; e < edgeCount; e++) {
+                const edge = tesseractData.edges[e];
+                const v1 = tesseractData.vertices[edge[0]];
+                const v2 = tesseractData.vertices[edge[1]];
+
+                for (let i = 0; i < particlesPerEdge; i++) {
+                    if (pIdx >= CONFIG.particleCount) break;
+
+                    roles[pIdx] = 1.0; // Defender
+
+                    // Interpolate along edge
+                    const t = i / particlesPerEdge;
+                    target4Ds[pIdx*4] = v1.x + (v2.x - v1.x) * t;
+                    target4Ds[pIdx*4+1] = v1.y + (v2.y - v1.y) * t;
+                    target4Ds[pIdx*4+2] = v1.z + (v2.z - v1.z) * t;
+                    target4Ds[pIdx*4+3] = v1.w + (v2.w - v1.w) * t;
+
+                    randoms[pIdx*3] = Math.random();
+                    randoms[pIdx*3+1] = Math.random();
+                    randoms[pIdx*3+2] = Math.random();
+                    
+                    pIdx++;
+                }
+            }
+
+            // -- Attackers Loop (The Rest) --
+            while (pIdx < CONFIG.particleCount) {
+                roles[pIdx] = 0.0; // Attacker
+                
+                randoms[pIdx*3] = Math.random();
+                randoms[pIdx*3+1] = Math.random();
+                randoms[pIdx*3+2] = Math.random();
+
+                target4Ds[pIdx*4] = 0;
+                
+                pIdx++;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('aTarget4D', new THREE.BufferAttribute(target4Ds, 4));
+            geometry.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 3));
+            geometry.setAttribute('aRole', new THREE.BufferAttribute(roles, 1));
+
+            material = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTime: { value: 0 },
+                    uAggression: { value: 0 },
+                    uScale: { value: CONFIG.hypercubeScale },
+                    uRotation: { value: new THREE.Vector4() },
+                    uColorDef: { value: CONFIG.colorDefenders },
+                    uColorAtt: { value: CONFIG.colorAttackers }
+                },
+                vertexShader: vertexShader,
+                fragmentShader: fragmentShader,
+                transparent: true,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+
+            points = new THREE.Points(geometry, material);
+            scene.add(points);
+
+            window.addEventListener('resize', onWindowResize);
+            
+            updateStats();
+            animate();
+        }
+
+        // --- Assimilation Logic ---
+        function assimilateParticles() {
+            // Converts a chunk of attackers to defenders
+            const roles = geometry.attributes.aRole.array;
+            const targets = geometry.attributes.aTarget4D.array;
+            let converted = 0;
+            let totalAttackers = 0;
+
+            // Simple random sampling to find candidates
+            // We iterate until we find enough or check everyone
+            for(let i=0; i < CONFIG.particleCount; i++) {
+                if (roles[i] === 0.0) totalAttackers++;
+
+                if (converted >= CONFIG.assimilationRate) continue;
+
+                if(roles[i] === 0.0) {
+                    // Random chance to convert this specific particle
+                    // Higher chance if we are desperate, lower if we have many
+                    if(Math.random() > 0.90) {
+                        roles[i] = 1.0; // Convert to Defender
+
+                        // Assign a place on the cube structure
+                        const edgeIdx = Math.floor(Math.random() * tesseractData.edges.length);
+                        const edge = tesseractData.edges[edgeIdx];
+                        const v1 = tesseractData.vertices[edge[0]];
+                        const v2 = tesseractData.vertices[edge[1]];
+                        const t = Math.random(); 
+
+                        targets[i*4] = v1.x + (v2.x - v1.x) * t;
+                        targets[i*4+1] = v1.y + (v2.y - v1.y) * t;
+                        targets[i*4+2] = v1.z + (v2.z - v1.z) * t;
+                        targets[i*4+3] = v1.w + (v2.w - v1.w) * t;
+
+                        converted++;
+                        state.defenders++;
+                        state.attackers--;
+                    }
+                }
+            }
+
+            if (converted > 0) {
+                geometry.attributes.aRole.needsUpdate = true;
+                geometry.attributes.aTarget4D.needsUpdate = true;
+                updateStats();
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('defender-count').innerText = state.defenders.toLocaleString();
+            document.getElementById('attacker-count').innerText = state.attackers.toLocaleString();
+        }
+
+        function updateStatusText() {
+            const el = document.getElementById('status-text');
+            if (state.aggression > 0.5) {
+                el.innerText = "AGGRESSIVE INCURSION";
+                el.style.color = "#ffffff";
+                el.style.textShadow = "0 0 10px #ffffff";
+            } else {
+                el.innerText = "DEFENSIVE ORBIT";
+                el.style.color = "#888888";
+                el.style.textShadow = "none";
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            time += 0.01;
+            
+            // --- AUTOMATION LOGIC ---
+            const wave = Math.sin(time * 0.4); 
+            state.targetAggression = wave > 0 ? 1 : 0;
+
+            // Detect Phase Change: Attack -> Peace
+            if (state.previousTarget === 1 && state.targetAggression === 0) {
+                assimilateParticles();
+            }
+            state.previousTarget = state.targetAggression;
+
+            state.aggression += (state.targetAggression - state.aggression) * 0.05;
+
+            material.uniforms.uTime.value = time;
+            material.uniforms.uAggression.value = state.aggression;
+
+            const speed = 0.2 + (state.aggression * 0.8);
+            material.uniforms.uRotation.value.set(
+                time * speed,
+                time * speed * 0.5,
+                time * speed * 0.25,
+                0
+            );
+
+            updateStatusText();
+            renderer.render(scene, camera);
+        }
+
+        init();
+    </script>
+</body>
+</html>
