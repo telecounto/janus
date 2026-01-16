@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Chimera | Investment Memorandum</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Rajdhani:wght@300;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #030305;
+            --accent-cyan: #00f3ff;
+            --accent-red: #ff2a2a;
+            --accent-gold: #ffc800;
+            --accent-purple: #bc13fe;
+            --text-main: #e0e0e0;
+            --text-dim: #7a7a7a;
+            --glass-bg: rgba(10, 10, 12, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* CANVAS LAYER */
+        #quantum-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* UI LAYER */
+        #ui-layer {
+            position: relative;
+            z-index: 10;
+            width: 90%;
+            max-width: 1200px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            pointer-events: none; /* Let clicks pass to nav */
+        }
+
+        /* SLIDE CONTENT */
+        .slide-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            padding: 3rem;
+            border-radius: 4px;
+            position: relative;
+            opacity: 0;
+            transform: scale(0.95); /* Start slightly smaller for pop effect */
+            transition: opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: row;
+            gap: 40px;
+            min-height: 400px;
+            overflow: hidden;
+        }
+
+        .slide-container.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .text-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .visual-content {
+            flex: 0.8;
+            border-left: 1px solid var(--glass-border);
+            padding-left: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* TYPOGRAPHY */
+        h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 3.5rem;
+            line-height: 1;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+
+        h2 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-cyan);
+        }
+
+        h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--accent-gold);
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            max-width: 600px;
+        }
+
+        .highlight {
+            color: var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        .danger {
+            color: var(--accent-red);
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-dim);
+        }
+
+        li::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+        }
+
+        /* DATA VIZ ELEMENTS */
+        .metric-box {
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .metric-val {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .metric-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        /* NAVIGATION - UPDATED */
+        .nav-zones {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none; /* Let clicks pass through the middle */
+        }
+        
+        .nav-btn {
+            width: 100px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.3s ease;
+            color: rgba(255,255,255,0.2);
+            background: linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+        }
+
+        .nav-btn.next {
+            background: linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+        }
+
+        .nav-btn:hover {
+            color: var(--accent-cyan);
+            background: linear-gradient(90deg, rgba(0,243,255,0.1) 0%, transparent 100%);
+            text-shadow: 0 0 15px var(--accent-cyan);
+        }
+        .nav-btn.next:hover {
+            background: linear-gradient(-90deg, rgba(0,243,255,0.1) 0%, transparent 100%);
+        }
+
+        .nav-btn svg {
+            width: 40px;
+            height: 40px;
+            fill: currentColor;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .nav-btn:hover svg {
+            transform: scale(1.5);
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: var(--accent-cyan);
+            width: 0%;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        .slide-counter {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            color: var(--text-dim);
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        /* UTILS */
+        .hidden { display: none; }
+        .glitch-effect { animation: glitch 1s infinite alternate; }
+
+        @keyframes glitch {
+            0% { text-shadow: 2px 0 rgba(255,0,0,0.5), -2px 0 rgba(0,0,255,0.5); }
+            100% { text-shadow: -2px 0 rgba(255,0,0,0.5), 2px 0 rgba(0,0,255,0.5); }
+        }
+
+        /* Image Placeholder styling */
+        .img-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px dashed var(--glass-border);
+            margin-bottom: 20px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 10px currentColor;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- BACKGROUND ENGINE -->
+    <canvas id="quantum-canvas"></canvas>
+
+    <!-- UI & CONTENT -->
+    <div id="ui-layer">
+        <!-- Slides inject here -->
+        <div id="slide-injector"></div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="nav-zones">
+        <div class="nav-btn prev" onclick="prevSlide()">
+            <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </div>
+        <div class="nav-btn next" onclick="nextSlide()">
+            <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </div>
+    </div>
+
+    <div class="progress-bar" id="progress"></div>
+    <div class="slide-counter" id="counter">01 / 25</div>
+
+    <script>
+        // --- DATA SOURCE ---
+        const slides = [
+            {
+                type: "intro",
+                h3: "Strategic Investment Memorandum",
+                h1: "PROJECT CHIMERA",
+                p: "Quantum Penetration Testing as a Service.<br>Defense by Simulation. Security by Chaos.",
+                visual: `<div class="metric-val" style="color:var(--accent-cyan)">SEED ROUND</div><div class="metric-label">Seeking $4M @ $25M CAP</div>`,
+                theme: "cyan",
+                chaos: 0.2
+            },
+            {
+                type: "standard",
+                h3: "01. Executive Summary",
+                h2: "The Investment Thesis",
+                p: "We are navigating the largest cryptographic discontinuity in history: Post-Quantum Cryptography (PQC).",
+                visual: `<div class="metric-box"><div class="metric-val">HNDL</div><div class="metric-label">Harvest Now, Decrypt Later</div></div>`,
+                theme: "cyan",
+                chaos: 0.3
+            },
+            {
+                type: "standard",
+                h3: "02. The Problem",
+                h2: "The Quantum Blind Spot",
+                p: "NIST standards (FIPS 203/204) are based on Math. <span class='danger'>Real attacks are Physics.</span>",
+                visual: `<div class="img-placeholder" style="border-color:var(--accent-red)"><span style="color:var(--accent-red)">MATH != PHYSICS</span></div>`,
+                theme: "red",
+                chaos: 0.8
+            },
+            {
+                type: "standard",
+                h3: "03. The Reality",
+                h2: "HNDL Threat",
+                p: "Data harvested today—genomics, intel, financial obligations—is already compromised if a quantum computer breaks encryption in 2030.",
+                visual: `<ul><li>Q-Day Risk Window: Opens ~2030</li><li>Data Shelf-Life: >10 Years</li><li>Status: <span class="danger">Compromised</span></li></ul>`,
+                theme: "red",
+                chaos: 0.9
+            },
+            {
+                type: "standard",
+                h3: "04. The Solution",
+                h2: "Project Chimera",
+                p: "We introduce <strong>QPaaS</strong>: Quantum Penetration Testing as a Service. We don't defend by algorithm; we defend by simulation.",
+                visual: `<div class="metric-box"><div class="metric-val">Offensive</div><div class="metric-label">Simulation Paradigm</div></div>`,
+                theme: "cyan",
+                chaos: 0.2
+            },
+            {
+                type: "standard",
+                h3: "05. Core Innovation",
+                h2: "Simulated Chaos",
+                p: "We solve Langevin Stochastic Differential Equations (SDEs) to mimic the noise fingerprints of quantum attacks.",
+                visual: `<div class="img-placeholder" style="border-color:var(--accent-cyan)">dX_t = -∇V(X_t)dt + √2D dW_t</div>`,
+                theme: "cyan",
+                chaos: 0.4
+            },
+            {
+                type: "standard",
+                h3: "06. Architecture",
+                h2: "The Trinity",
+                p: "Three interconnected modules forming a recursive adversarial loop.",
+                visual: `<ul><li style="color:var(--accent-cyan)">PETRI: The Environment</li><li style="color:var(--accent-red)">SENTINEL: The Hunter</li><li style="color:var(--accent-gold)">ORACLE: The Judge</li></ul>`,
+                theme: "gold",
+                chaos: 0.5
+            },
+            {
+                type: "standard",
+                h3: "07. Module 01",
+                h2: "PETRI",
+                p: "A classical physics engine generating entropy landscapes. Models decoherence (T1/T2 relaxation).",
+                visual: `<div class="metric-box"><div class="metric-val">10^9</div><div class="metric-label">Particle Steps / Sec</div></div>`,
+                theme: "cyan",
+                chaos: 0.6
+            },
+            {
+                type: "standard",
+                h3: "08. Module 02",
+                h2: "SENTINEL",
+                p: "Adversarial AI Swarm. Reinforcement Learning agents trained to predict 'random' trajectories.",
+                visual: `<div class="metric-box"><div class="metric-val" style="color:var(--accent-red)">PPO + Transformers</div><div class="metric-label">Neural Architecture</div></div>`,
+                theme: "red",
+                chaos: 0.7
+            },
+            {
+                type: "standard",
+                h3: "09. Module 03",
+                h2: "ORACLE",
+                p: "Quantum-resistant distributed ledger (DAG). Issues the 'Certificate of Chaos' for compliance.",
+                visual: `<div class="metric-box"><div class="metric-val" style="color:var(--accent-gold)">FIPS 204</div><div class="metric-label">Compliance Standard</div></div>`,
+                theme: "gold",
+                chaos: 0.1
+            },
+            {
+                type: "standard",
+                h3: "10. The Moat",
+                h2: "PetriCorp Ecosystem",
+                p: "We are not starting from scratch. We leverage shared IP from sister platforms.",
+                visual: `<ul><li>Helix (Bio): Physics AI</li><li>Nexus (Sim): RL Agents</li><li>Quantum (Lab): Noise Models</li></ul>`,
+                theme: "purple",
+                chaos: 0.3
+            },
+            {
+                type: "standard",
+                h3: "11. Validation",
+                h2: "Scientific Basis",
+                p: "Helix platform achieved 95% accuracy on CASP15. We are repurposing that 'Differentiable Docking' engine for crypto-analysis.",
+                visual: `<div class="img-placeholder">Proven IP Transfer</div>`,
+                theme: "purple",
+                chaos: 0.2
+            },
+            {
+                type: "standard",
+                h3: "12. Market Dynamics",
+                h2: "The Catalyst",
+                p: "NIST FIPS 203, 204, 205 finalized August 2024. Mandates for Federal Agencies & Defense.",
+                visual: `<div class="metric-box"><div class="metric-val">Regulatory</div><div class="metric-label">Forced Buyer Market</div></div>`,
+                theme: "cyan",
+                chaos: 0.1
+            },
+            {
+                type: "standard",
+                h3: "13. Market Size",
+                h2: "$10 Billion TAM",
+                p: "Projected by 2030 with a CAGR of ~40%. BFSI and Defense are the primary drivers.",
+                visual: `<div class="metric-box"><div class="metric-val">$10B</div><div class="metric-label">Total Addressable Market</div></div>`,
+                theme: "gold",
+                chaos: 0.2
+            },
+            {
+                type: "standard",
+                h3: "14. Competition",
+                h2: "SandboxAQ",
+                p: "The Generalist Goliath ($5.75B Val). They sell implementation. We sell the *Audit*.",
+                visual: `<ul><li>Them: Full Stack / Generalist</li><li>Us: Specialized Red Team</li><li>Strategy: Becoming the Audit Standard</li></ul>`,
+                theme: "red",
+                chaos: 0.5
+            },
+            {
+                type: "standard",
+                h3: "15. Competition",
+                h2: "PQShield & QuSecure",
+                p: "Implementation providers. Potential partners who need our 'Certificate of Chaos' to validate their claims.",
+                visual: `<div class="img-placeholder">Partner Ecosystem</div>`,
+                theme: "cyan",
+                chaos: 0.3
+            },
+            {
+                type: "standard",
+                h3: "16. Financials",
+                h2: "Transaction Overview",
+                p: "We are raising capital to fund a 12-month engineering sprint.",
+                visual: `<div class="metric-box"><div class="metric-val">$4,000,000</div><div class="metric-label">Raise Amount (SAFE)</div></div>`,
+                theme: "gold",
+                chaos: 0.1
+            },
+            {
+                type: "standard",
+                h3: "17. Valuation",
+                h2: "The Terms",
+                p: "$25M Post-Money Valuation Cap. A compelling entry for Deep Tech infrastructure.",
+                visual: `<div class="metric-box"><div class="metric-val">~20 Months</div><div class="metric-label">Runway</div></div>`,
+                theme: "gold",
+                chaos: 0.1
+            },
+            {
+                type: "standard",
+                h3: "18. Use of Funds",
+                h2: "Allocation",
+                p: "Heavy investment in R&D and Infrastructure. We are building a digital wind tunnel.",
+                visual: `<ul><li>45%: Engineering Talent</li><li>30%: Compute (H100s)</li><li>15%: Security Audits</li><li>10%: Ops/IP</li></ul>`,
+                theme: "cyan",
+                chaos: 0.2
+            },
+            {
+                type: "standard",
+                h3: "19. Unit Economics",
+                h2: "Projections",
+                p: "Targeting $12M Revenue by Year 3 with 75% Gross Margins.",
+                visual: `<div class="metric-box"><div class="metric-val">$250k</div><div class="metric-label">Target ASP (Enterprise)</div></div>`,
+                theme: "gold",
+                chaos: 0.2
+            },
+            {
+                type: "standard",
+                h3: "20. Roadmap: Q1",
+                h2: "The Physics Engine",
+                p: "Critical Milestone: Scaling Petri to 10^9 particle steps/sec on NVIDIA H100s.",
+                visual: `<div class="img-placeholder">Phase: BUILD</div>`,
+                theme: "cyan",
+                chaos: 0.4
+            },
+            {
+                type: "standard",
+                h3: "21. Roadmap: Q2",
+                h2: "The Hunter",
+                p: "Training Sentinel Agents to predict standard PRNGs. Calibration phase.",
+                visual: `<div class="img-placeholder">Phase: TRAIN</div>`,
+                theme: "red",
+                chaos: 0.5
+            },
+            {
+                type: "standard",
+                h3: "22. Roadmap: Q3",
+                h2: "Trinity Integration",
+                p: "Connecting Petri, Sentinel, and Oracle into a unified pipeline (Alpha Release).",
+                visual: `<div class="img-placeholder">Phase: INTEGRATE</div>`,
+                theme: "gold",
+                chaos: 0.3
+            },
+            {
+                type: "standard",
+                h3: "23. Roadmap: Q4",
+                h2: "Commercial Hardening",
+                p: "FIPS 140-3 readiness and launch of first paid pilot with a Tier-1 Custodian.",
+                visual: `<div class="img-placeholder">Phase: DEPLOY</div>`,
+                theme: "cyan",
+                chaos: 0.1
+            },
+            {
+                type: "standard",
+                h3: "24. Risk Assessment",
+                h2: "Key Risks",
+                p: "Simulation vs. Reality Gap. Mitigated by our deep expertise in Langevin dynamics from the Quantum Platform.",
+                visual: `<ul><li>Technical: Compute Scaling</li><li>Market: Regulatory Flux</li><li>Mitigation: PetriCorp Shared IP</li></ul>`,
+                theme: "red",
+                chaos: 0.4
+            },
+            {
+                type: "intro",
+                h3: "Join the Round",
+                h1: "INVEST IN CHAOS",
+                p: "Help us build the quantum wind tunnel.<br>partners@petricorp.xyz",
+                visual: `<div class="metric-val" style="color:var(--accent-cyan)">PROJECT CHIMERA</div>`,
+                theme: "cyan",
+                chaos: 0.05
+            }
+        ];
+
+        // --- APP STATE ---
+        let currentSlide = 0;
+        const injector = document.getElementById('slide-injector');
+        const progressBar = document.getElementById('progress');
+        const counter = document.getElementById('counter');
+
+        // --- PARTICLE ENGINE SETUP ---
+        const canvas = document.getElementById('quantum-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let width, height;
+        let mouse = { x: null, y: null };
+        let globalBurst = 0; // The burst energy for transitions
+        
+        // Configuration that changes per slide
+        let particleConfig = {
+            color: '0, 243, 255', // RGB
+            speed: 0.5,
+            connectivity: 150,
+            chaos: 0.2,
+            count: 100
+        };
+
+        // Resize Handling
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initParticles();
+        }
+        window.addEventListener('resize', resize);
+
+        // Particle Class
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * particleConfig.speed;
+                this.vy = (Math.random() - 0.5) * particleConfig.speed;
+                this.size = Math.random() * 2 + 1;
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.density = (Math.random() * 30) + 1;
+            }
+
+            update() {
+                // Mouse Interaction (Quantum Observer Effect)
+                if (mouse.x) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx*dx + dy*dy);
+                    let maxDistance = 200;
+                    
+                    if (distance < maxDistance) {
+                        let forceDirectionX = dx / distance;
+                        let forceDirectionY = dy / distance;
+                        let force = (maxDistance - distance) / maxDistance;
+                        // Push particles away from mouse
+                        let directionX = forceDirectionX * force * this.density;
+                        let directionY = forceDirectionY * force * this.density;
+                        this.x -= directionX;
+                        this.y -= directionY;
+                    }
+                }
+
+                // Add Burst Energy (Dissolve effect)
+                if (globalBurst > 0.1) {
+                    this.vx += (Math.random() - 0.5) * globalBurst;
+                    this.vy += (Math.random() - 0.5) * globalBurst;
+                }
+
+                // Chaos / Brownian Motion Simulation
+                this.vx += (Math.random() - 0.5) * particleConfig.chaos;
+                this.vy += (Math.random() - 0.5) * particleConfig.chaos;
+                
+                // Dynamic Speed Clamping
+                // Allow higher speeds during bursts, then clamp down
+                const burstMultiplier = 1 + (globalBurst * 2); 
+                const maxSpeed = particleConfig.speed * 3 * burstMultiplier;
+                
+                // Soft friction
+                this.vx *= 0.98; 
+                this.vy *= 0.98;
+
+                if(this.vx > maxSpeed) this.vx = maxSpeed;
+                if(this.vx < -maxSpeed) this.vx = -maxSpeed;
+                if(this.vy > maxSpeed) this.vy = maxSpeed;
+                if(this.vy < -maxSpeed) this.vy = -maxSpeed;
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Boundaries (Wrap around)
+                if (this.x < 0) this.x = width;
+                if (this.x > width) this.x = 0;
+                if (this.y < 0) this.y = height;
+                if (this.y > height) this.y = 0;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${particleConfig.color}, ${0.8 - (globalBurst/20)})`; // Fade out during burst
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            let count = (width * height) / 15000; // Density based on screen size
+            if (count > 150) count = 150; // Cap
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Decay global burst energy
+            globalBurst = globalBurst * 0.9;
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+                // Connectivity
+                // During high burst (dissolve), connections break (max distance effectively shrinks or we skip)
+                if (particleConfig.connectivity > 0 && globalBurst < 5) {
+                    for (let j = i; j < particles.length; j++) {
+                        let dx = particles[i].x - particles[j].x;
+                        let dy = particles[i].y - particles[j].y;
+                        let distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < particleConfig.connectivity) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(${particleConfig.color}, ${1 - distance/particleConfig.connectivity})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        // Mouse Listeners
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        // --- RENDER LOGIC ---
+
+        function updateSlide(direction) {
+            const data = slides[currentSlide];
+            
+            // Trigger Particle Explosion (Dissolve)
+            globalBurst = 20; 
+
+            // Update UI
+            // We use opacity fade out first if desired, but replacing innerHTML with CSS animation handles it
+            
+            let mainHeading = '';
+            if (data.h1) {
+                mainHeading = `<h1 class="${data.theme === 'red' ? 'glitch-effect' : ''}" style="color: ${data.theme === 'red' ? 'var(--accent-red)' : (data.theme === 'gold' ? 'var(--accent-gold)' : 'var(--text-main)')}">${data.h1}</h1>`;
+            } else if (data.h2) {
+                mainHeading = `<h2>${data.h2}</h2>`;
+            }
+
+            const slideHTML = `
+                <div class="slide-container active">
+                    <div class="text-content">
+                        <h3>${data.h3}</h3>
+                        ${mainHeading}
+                        <p>${data.p}</p>
+                    </div>
+                    <div class="visual-content">
+                        ${data.visual}
+                    </div>
+                </div>
+            `;
+            
+            // Inject new content
+            injector.innerHTML = slideHTML;
+
+            // Update Progress
+            const pct = ((currentSlide + 1) / slides.length) * 100;
+            progressBar.style.width = `${pct}%`;
+            counter.innerText = `${String(currentSlide + 1).padStart(2, '0')} / ${slides.length}`;
+
+            // Update Physics Engine Config
+            let targetColor = '0, 243, 255'; // Cyan default
+            if (data.theme === 'red') targetColor = '255, 42, 42';
+            if (data.theme === 'gold') targetColor = '255, 200, 0';
+            if (data.theme === 'purple') targetColor = '188, 19, 254';
+
+            particleConfig.color = targetColor;
+            particleConfig.chaos = data.chaos;
+            particleConfig.speed = (data.chaos * 2) + 0.5;
+            
+            if (data.theme === 'red') {
+                particleConfig.connectivity = 0; 
+            } else {
+                particleConfig.connectivity = 150;
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlide('next');
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide('prev');
+            }
+        }
+
+        // Keyboard Nav
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        // Init
+        resize();
+        animate();
+        updateSlide(); // Start
+    </script>
+</body>
+</html>
+
