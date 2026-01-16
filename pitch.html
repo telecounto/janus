@@ -6,18 +6,21 @@
     <title>Project Chimera | Investment Memorandum</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Rajdhani:wght@300;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #030305;
-            --accent-cyan: #00f3ff;
-            --accent-red: #ff2a2a;
-            --accent-gold: #ffc800;
-            --accent-purple: #bc13fe;
-            --text-main: #e0e0e0;
-            --text-dim: #7a7a7a;
-            --glass-bg: rgba(10, 10, 12, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            /* MONOCHROME PALETTE */
+            --bg-color: #050505;
+            --accent-primary: #ffffff;
+            --accent-secondary: #a0a0a0;
+            --accent-dim: #404040;
+            
+            --text-main: #f0f0f0;
+            --text-muted: #888888;
+            
+            --panel-bg: rgba(15, 15, 15, 0.85);
+            --panel-border: rgba(255, 255, 255, 0.15);
+            --panel-border-active: rgba(255, 255, 255, 0.4);
         }
 
         * {
@@ -46,40 +49,43 @@
             width: 100%;
             height: 100%;
             z-index: 1;
+            /* Lower contrast for background particles to keep text crisp */
+            opacity: 0.6; 
         }
 
         /* UI LAYER */
         #ui-layer {
             position: relative;
             z-index: 10;
-            width: 90%;
-            max-width: 1200px;
-            height: 80vh;
+            /* INCREASED REAL ESTATE */
+            width: 95%; 
+            max-width: 1600px; 
+            height: 85vh;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            pointer-events: none; /* Let clicks pass to nav */
+            justify-content: center; /* Center vertically */
+            pointer-events: none; 
         }
 
-        /* SLIDE CONTENT */
+        /* SLIDE CONTAINER */
         .slide-container {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            padding: 3rem;
-            border-radius: 4px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px); /* Heavy blur for clean text */
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--panel-border);
+            padding: 4rem; /* More padding */
+            border-radius: 2px; /* Sharper corners */
             position: relative;
             opacity: 0;
-            transform: scale(0.95); /* Start slightly smaller for pop effect */
-            transition: opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: scale(0.98);
+            transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: auto;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: row;
-            gap: 40px;
-            min-height: 400px;
-            overflow: hidden;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr; /* More space for text */
+            gap: 80px;
+            height: 100%;
+            align-items: center;
         }
 
         .slide-container.active {
@@ -88,64 +94,77 @@
         }
 
         .text-content {
-            flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            height: 100%;
         }
 
         .visual-content {
-            flex: 0.8;
-            border-left: 1px solid var(--glass-border);
-            padding-left: 40px;
+            border-left: 1px solid var(--panel-border);
+            padding-left: 80px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            height: 100%;
         }
 
-        /* TYPOGRAPHY */
+        /* TYPOGRAPHY - CLEAN & CRISP */
         h1 {
             font-family: 'Rajdhani', sans-serif;
-            font-size: 3.5rem;
-            line-height: 1;
+            font-size: 5rem; /* Larger Title */
+            line-height: 0.9;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            letter-spacing: -1px;
+            margin-bottom: 1.5rem;
+            color: var(--accent-primary);
         }
 
         h2 {
             font-family: 'Rajdhani', sans-serif;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--accent-cyan);
+            font-size: 3.5rem; /* Larger Headers */
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--accent-primary);
+            letter-spacing: -0.5px;
         }
 
         h3 {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            color: var(--accent-gold);
-            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 10px;
+            display: inline-block;
+            width: fit-content;
         }
 
         p {
-            font-size: 1.2rem;
-            line-height: 1.6;
+            font-size: 1.5rem; /* Larger Body Text */
+            line-height: 1.5;
             color: var(--text-main);
-            margin-bottom: 1.5rem;
-            max-width: 600px;
+            margin-bottom: 2rem;
+            font-weight: 300;
+            max-width: 90%;
         }
 
         .highlight {
-            color: var(--accent-cyan);
-            font-weight: 700;
+            color: var(--accent-primary);
+            font-weight: 600;
+            border-bottom: 1px solid var(--accent-primary);
         }
 
         .danger {
-            color: var(--accent-red);
+            color: var(--accent-primary);
+            background: var(--text-main); /* Inverted for impact in grayscale */
+            color: black;
+            padding: 0 5px;
+            font-weight: 700;
         }
 
         ul {
@@ -154,43 +173,50 @@
 
         li {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            margin-bottom: 0.8rem;
-            padding-left: 1.5rem;
+            font-size: 1rem;
+            margin-bottom: 1.2rem;
+            padding-left: 2rem;
             position: relative;
-            color: var(--text-dim);
+            color: var(--text-muted);
         }
 
         li::before {
             content: '>';
             position: absolute;
             left: 0;
-            color: var(--accent-cyan);
+            color: var(--accent-primary);
+            font-weight: 700;
         }
 
-        /* DATA VIZ ELEMENTS */
+        /* DATA VIZ ELEMENTS - MONOCHROME */
         .metric-box {
-            border: 1px solid var(--glass-border);
-            padding: 20px;
-            background: rgba(0,0,0,0.3);
-            margin-bottom: 15px;
+            border: 1px solid var(--panel-border);
+            padding: 30px;
+            background: rgba(255,255,255,0.02);
+            margin-bottom: 20px;
             width: 100%;
+            transition: border-color 0.3s;
+        }
+        .metric-box:hover {
+            border-color: var(--accent-primary);
         }
 
         .metric-val {
-            font-size: 2.5rem;
+            font-size: 3.5rem;
             font-weight: 700;
-            color: var(--text-main);
+            color: var(--accent-primary);
+            letter-spacing: -2px;
         }
 
         .metric-label {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            color: var(--text-dim);
+            font-size: 0.9rem;
+            color: var(--text-muted);
             text-transform: uppercase;
+            margin-top: 5px;
         }
 
-        /* NAVIGATION - UPDATED */
+        /* NAVIGATION */
         .nav-zones {
             position: absolute;
             top: 0;
@@ -200,11 +226,11 @@
             z-index: 20;
             display: flex;
             justify-content: space-between;
-            pointer-events: none; /* Let clicks pass through the middle */
+            pointer-events: none;
         }
         
         .nav-btn {
-            width: 100px;
+            width: 120px;
             height: 100%;
             display: flex;
             align-items: center;
@@ -212,81 +238,85 @@
             cursor: pointer;
             pointer-events: auto;
             transition: all 0.3s ease;
-            color: rgba(255,255,255,0.2);
-            background: linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+            color: var(--accent-dim);
+            /* Subtle gradients for hover zones */
+            background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, transparent 100%);
         }
 
         .nav-btn.next {
-            background: linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+            background: linear-gradient(-90deg, rgba(0,0,0,0.8) 0%, transparent 100%);
         }
 
         .nav-btn:hover {
-            color: var(--accent-cyan);
-            background: linear-gradient(90deg, rgba(0,243,255,0.1) 0%, transparent 100%);
-            text-shadow: 0 0 15px var(--accent-cyan);
-        }
-        .nav-btn.next:hover {
-            background: linear-gradient(-90deg, rgba(0,243,255,0.1) 0%, transparent 100%);
+            color: var(--accent-primary);
         }
 
         .nav-btn svg {
             width: 40px;
             height: 40px;
             fill: currentColor;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
         }
 
         .nav-btn:hover svg {
-            transform: scale(1.5);
+            transform: scale(1.2);
         }
 
         .progress-bar {
             position: absolute;
             bottom: 0;
             left: 0;
-            height: 4px;
-            background: var(--accent-cyan);
+            height: 2px;
+            background: var(--accent-primary);
             width: 0%;
             transition: width 0.5s ease;
-            box-shadow: 0 0 10px var(--accent-cyan);
         }
 
         .slide-counter {
             position: absolute;
-            bottom: 30px;
-            right: 40px;
+            bottom: 40px;
+            right: 60px;
             font-family: 'JetBrains Mono', monospace;
             font-size: 1rem;
-            color: var(--text-dim);
+            color: var(--text-muted);
             z-index: 15;
             pointer-events: none;
         }
 
         /* UTILS */
-        .hidden { display: none; }
-        .glitch-effect { animation: glitch 1s infinite alternate; }
+        .glitch-effect { 
+            animation: glitch 0.3s infinite; 
+            color: white;
+        }
 
         @keyframes glitch {
-            0% { text-shadow: 2px 0 rgba(255,0,0,0.5), -2px 0 rgba(0,0,255,0.5); }
-            100% { text-shadow: -2px 0 rgba(255,0,0,0.5), 2px 0 rgba(0,0,255,0.5); }
+            0% { transform: translate(0); opacity: 1; }
+            20% { transform: translate(-2px, 2px); opacity: 0.8; }
+            40% { transform: translate(-2px, -2px); opacity: 1; }
+            60% { transform: translate(2px, 2px); opacity: 0.8; }
+            80% { transform: translate(2px, -2px); opacity: 1; }
+            100% { transform: translate(0); opacity: 1; }
         }
 
         /* Image Placeholder styling */
         .img-placeholder {
             width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            height: 250px;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(255,255,255,0.03),
+                rgba(255,255,255,0.03) 10px,
+                rgba(255,255,255,0.05) 10px,
+                rgba(255,255,255,0.05) 20px
+            );
             display: flex;
             justify-content: center;
             align-items: center;
-            border: 1px dashed var(--glass-border);
+            border: 1px solid var(--panel-border);
             margin-bottom: 20px;
-            color: var(--text-dim);
+            color: var(--text-main);
             font-family: 'JetBrains Mono', monospace;
-        }
-        
-        .glow-text {
-            text-shadow: 0 0 10px currentColor;
+            text-transform: uppercase;
         }
 
     </style>
@@ -298,8 +328,7 @@
 
     <!-- UI & CONTENT -->
     <div id="ui-layer">
-        <!-- Slides inject here -->
-        <div id="slide-injector"></div>
+        <div id="slide-injector" style="height: 100%;"></div>
     </div>
 
     <!-- CONTROLS -->
@@ -323,8 +352,8 @@
                 h3: "Strategic Investment Memorandum",
                 h1: "PROJECT CHIMERA",
                 p: "Quantum Penetration Testing as a Service.<br>Defense by Simulation. Security by Chaos.",
-                visual: `<div class="metric-val" style="color:var(--accent-cyan)">SEED ROUND</div><div class="metric-label">Seeking $4M @ $25M CAP</div>`,
-                theme: "cyan",
+                visual: `<div class="metric-val">SEED ROUND</div><div class="metric-label">Seeking $4M @ $25M CAP</div>`,
+                theme: "default",
                 chaos: 0.2
             },
             {
@@ -333,7 +362,7 @@
                 h2: "The Investment Thesis",
                 p: "We are navigating the largest cryptographic discontinuity in history: Post-Quantum Cryptography (PQC).",
                 visual: `<div class="metric-box"><div class="metric-val">HNDL</div><div class="metric-label">Harvest Now, Decrypt Later</div></div>`,
-                theme: "cyan",
+                theme: "default",
                 chaos: 0.3
             },
             {
@@ -341,8 +370,8 @@
                 h3: "02. The Problem",
                 h2: "The Quantum Blind Spot",
                 p: "NIST standards (FIPS 203/204) are based on Math. <span class='danger'>Real attacks are Physics.</span>",
-                visual: `<div class="img-placeholder" style="border-color:var(--accent-red)"><span style="color:var(--accent-red)">MATH != PHYSICS</span></div>`,
-                theme: "red",
+                visual: `<div class="img-placeholder" style="border-color: white"><span>MATH != PHYSICS</span></div>`,
+                theme: "danger",
                 chaos: 0.8
             },
             {
@@ -351,7 +380,7 @@
                 h2: "HNDL Threat",
                 p: "Data harvested today—genomics, intel, financial obligations—is already compromised if a quantum computer breaks encryption in 2030.",
                 visual: `<ul><li>Q-Day Risk Window: Opens ~2030</li><li>Data Shelf-Life: >10 Years</li><li>Status: <span class="danger">Compromised</span></li></ul>`,
-                theme: "red",
+                theme: "danger",
                 chaos: 0.9
             },
             {
@@ -360,7 +389,7 @@
                 h2: "Project Chimera",
                 p: "We introduce <strong>QPaaS</strong>: Quantum Penetration Testing as a Service. We don't defend by algorithm; we defend by simulation.",
                 visual: `<div class="metric-box"><div class="metric-val">Offensive</div><div class="metric-label">Simulation Paradigm</div></div>`,
-                theme: "cyan",
+                theme: "default",
                 chaos: 0.2
             },
             {
@@ -368,8 +397,8 @@
                 h3: "05. Core Innovation",
                 h2: "Simulated Chaos",
                 p: "We solve Langevin Stochastic Differential Equations (SDEs) to mimic the noise fingerprints of quantum attacks.",
-                visual: `<div class="img-placeholder" style="border-color:var(--accent-cyan)">dX_t = -∇V(X_t)dt + √2D dW_t</div>`,
-                theme: "cyan",
+                visual: `<div class="img-placeholder">dX_t = -∇V(X_t)dt + √2D dW_t</div>`,
+                theme: "default",
                 chaos: 0.4
             },
             {
@@ -377,8 +406,8 @@
                 h3: "06. Architecture",
                 h2: "The Trinity",
                 p: "Three interconnected modules forming a recursive adversarial loop.",
-                visual: `<ul><li style="color:var(--accent-cyan)">PETRI: The Environment</li><li style="color:var(--accent-red)">SENTINEL: The Hunter</li><li style="color:var(--accent-gold)">ORACLE: The Judge</li></ul>`,
-                theme: "gold",
+                visual: `<ul><li>PETRI: The Environment</li><li>SENTINEL: The Hunter</li><li>ORACLE: The Judge</li></ul>`,
+                theme: "metal",
                 chaos: 0.5
             },
             {
@@ -387,7 +416,7 @@
                 h2: "PETRI",
                 p: "A classical physics engine generating entropy landscapes. Models decoherence (T1/T2 relaxation).",
                 visual: `<div class="metric-box"><div class="metric-val">10^9</div><div class="metric-label">Particle Steps / Sec</div></div>`,
-                theme: "cyan",
+                theme: "default",
                 chaos: 0.6
             },
             {
@@ -395,8 +424,8 @@
                 h3: "08. Module 02",
                 h2: "SENTINEL",
                 p: "Adversarial AI Swarm. Reinforcement Learning agents trained to predict 'random' trajectories.",
-                visual: `<div class="metric-box"><div class="metric-val" style="color:var(--accent-red)">PPO + Transformers</div><div class="metric-label">Neural Architecture</div></div>`,
-                theme: "red",
+                visual: `<div class="metric-box"><div class="metric-val">PPO + Transformers</div><div class="metric-label">Neural Architecture</div></div>`,
+                theme: "danger",
                 chaos: 0.7
             },
             {
@@ -404,8 +433,8 @@
                 h3: "09. Module 03",
                 h2: "ORACLE",
                 p: "Quantum-resistant distributed ledger (DAG). Issues the 'Certificate of Chaos' for compliance.",
-                visual: `<div class="metric-box"><div class="metric-val" style="color:var(--accent-gold)">FIPS 204</div><div class="metric-label">Compliance Standard</div></div>`,
-                theme: "gold",
+                visual: `<div class="metric-box"><div class="metric-val">FIPS 204</div><div class="metric-label">Compliance Standard</div></div>`,
+                theme: "metal",
                 chaos: 0.1
             },
             {
@@ -414,7 +443,7 @@
                 h2: "PetriCorp Ecosystem",
                 p: "We are not starting from scratch. We leverage shared IP from sister platforms.",
                 visual: `<ul><li>Helix (Bio): Physics AI</li><li>Nexus (Sim): RL Agents</li><li>Quantum (Lab): Noise Models</li></ul>`,
-                theme: "purple",
+                theme: "metal",
                 chaos: 0.3
             },
             {
@@ -423,7 +452,7 @@
                 h2: "Scientific Basis",
                 p: "Helix platform achieved 95% accuracy on CASP15. We are repurposing that 'Differentiable Docking' engine for crypto-analysis.",
                 visual: `<div class="img-placeholder">Proven IP Transfer</div>`,
-                theme: "purple",
+                theme: "metal",
                 chaos: 0.2
             },
             {
@@ -432,7 +461,7 @@
                 h2: "The Catalyst",
                 p: "NIST FIPS 203, 204, 205 finalized August 2024. Mandates for Federal Agencies & Defense.",
                 visual: `<div class="metric-box"><div class="metric-val">Regulatory</div><div class="metric-label">Forced Buyer Market</div></div>`,
-                theme: "cyan",
+                theme: "default",
                 chaos: 0.1
             },
             {
@@ -441,7 +470,7 @@
                 h2: "$10 Billion TAM",
                 p: "Projected by 2030 with a CAGR of ~40%. BFSI and Defense are the primary drivers.",
                 visual: `<div class="metric-box"><div class="metric-val">$10B</div><div class="metric-label">Total Addressable Market</div></div>`,
-                theme: "gold",
+                theme: "metal",
                 chaos: 0.2
             },
             {
@@ -450,7 +479,7 @@
                 h2: "SandboxAQ",
                 p: "The Generalist Goliath ($5.75B Val). They sell implementation. We sell the *Audit*.",
                 visual: `<ul><li>Them: Full Stack / Generalist</li><li>Us: Specialized Red Team</li><li>Strategy: Becoming the Audit Standard</li></ul>`,
-                theme: "red",
+                theme: "danger",
                 chaos: 0.5
             },
             {
@@ -459,7 +488,7 @@
                 h2: "PQShield & QuSecure",
                 p: "Implementation providers. Potential partners who need our 'Certificate of Chaos' to validate their claims.",
                 visual: `<div class="img-placeholder">Partner Ecosystem</div>`,
-                theme: "cyan",
+                theme: "default",
                 chaos: 0.3
             },
             {
@@ -468,7 +497,7 @@
                 h2: "Transaction Overview",
                 p: "We are raising capital to fund a 12-month engineering sprint.",
                 visual: `<div class="metric-box"><div class="metric-val">$4,000,000</div><div class="metric-label">Raise Amount (SAFE)</div></div>`,
-                theme: "gold",
+                theme: "metal",
                 chaos: 0.1
             },
             {
@@ -477,7 +506,7 @@
                 h2: "The Terms",
                 p: "$25M Post-Money Valuation Cap. A compelling entry for Deep Tech infrastructure.",
                 visual: `<div class="metric-box"><div class="metric-val">~20 Months</div><div class="metric-label">Runway</div></div>`,
-                theme: "gold",
+                theme: "metal",
                 chaos: 0.1
             },
             {
@@ -486,7 +515,7 @@
                 h2: "Allocation",
                 p: "Heavy investment in R&D and Infrastructure. We are building a digital wind tunnel.",
                 visual: `<ul><li>45%: Engineering Talent</li><li>30%: Compute (H100s)</li><li>15%: Security Audits</li><li>10%: Ops/IP</li></ul>`,
-                theme: "cyan",
+                theme: "default",
                 chaos: 0.2
             },
             {
@@ -495,7 +524,7 @@
                 h2: "Projections",
                 p: "Targeting $12M Revenue by Year 3 with 75% Gross Margins.",
                 visual: `<div class="metric-box"><div class="metric-val">$250k</div><div class="metric-label">Target ASP (Enterprise)</div></div>`,
-                theme: "gold",
+                theme: "metal",
                 chaos: 0.2
             },
             {
@@ -504,7 +533,7 @@
                 h2: "The Physics Engine",
                 p: "Critical Milestone: Scaling Petri to 10^9 particle steps/sec on NVIDIA H100s.",
                 visual: `<div class="img-placeholder">Phase: BUILD</div>`,
-                theme: "cyan",
+                theme: "default",
                 chaos: 0.4
             },
             {
@@ -513,7 +542,7 @@
                 h2: "The Hunter",
                 p: "Training Sentinel Agents to predict standard PRNGs. Calibration phase.",
                 visual: `<div class="img-placeholder">Phase: TRAIN</div>`,
-                theme: "red",
+                theme: "danger",
                 chaos: 0.5
             },
             {
@@ -522,7 +551,7 @@
                 h2: "Trinity Integration",
                 p: "Connecting Petri, Sentinel, and Oracle into a unified pipeline (Alpha Release).",
                 visual: `<div class="img-placeholder">Phase: INTEGRATE</div>`,
-                theme: "gold",
+                theme: "metal",
                 chaos: 0.3
             },
             {
@@ -531,7 +560,7 @@
                 h2: "Commercial Hardening",
                 p: "FIPS 140-3 readiness and launch of first paid pilot with a Tier-1 Custodian.",
                 visual: `<div class="img-placeholder">Phase: DEPLOY</div>`,
-                theme: "cyan",
+                theme: "default",
                 chaos: 0.1
             },
             {
@@ -540,7 +569,7 @@
                 h2: "Key Risks",
                 p: "Simulation vs. Reality Gap. Mitigated by our deep expertise in Langevin dynamics from the Quantum Platform.",
                 visual: `<ul><li>Technical: Compute Scaling</li><li>Market: Regulatory Flux</li><li>Mitigation: PetriCorp Shared IP</li></ul>`,
-                theme: "red",
+                theme: "danger",
                 chaos: 0.4
             },
             {
@@ -548,8 +577,8 @@
                 h3: "Join the Round",
                 h1: "INVEST IN CHAOS",
                 p: "Help us build the quantum wind tunnel.<br>partners@petricorp.xyz",
-                visual: `<div class="metric-val" style="color:var(--accent-cyan)">PROJECT CHIMERA</div>`,
-                theme: "cyan",
+                visual: `<div class="metric-val">PROJECT CHIMERA</div>`,
+                theme: "default",
                 chaos: 0.05
             }
         ];
@@ -566,11 +595,10 @@
         let particles = [];
         let width, height;
         let mouse = { x: null, y: null };
-        let globalBurst = 0; // The burst energy for transitions
+        let globalBurst = 0; 
         
-        // Configuration that changes per slide
         let particleConfig = {
-            color: '0, 243, 255', // RGB
+            color: '255, 255, 255', // Pure white
             speed: 0.5,
             connectivity: 150,
             chaos: 0.2,
@@ -592,14 +620,14 @@
                 this.y = Math.random() * height;
                 this.vx = (Math.random() - 0.5) * particleConfig.speed;
                 this.vy = (Math.random() - 0.5) * particleConfig.speed;
-                this.size = Math.random() * 2 + 1;
+                this.size = Math.random() * 2 + 0.5; // Smaller, sharper particles
                 this.baseX = this.x;
                 this.baseY = this.y;
                 this.density = (Math.random() * 30) + 1;
             }
 
             update() {
-                // Mouse Interaction (Quantum Observer Effect)
+                // Mouse Interaction
                 if (mouse.x) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
@@ -610,7 +638,6 @@
                         let forceDirectionX = dx / distance;
                         let forceDirectionY = dy / distance;
                         let force = (maxDistance - distance) / maxDistance;
-                        // Push particles away from mouse
                         let directionX = forceDirectionX * force * this.density;
                         let directionY = forceDirectionY * force * this.density;
                         this.x -= directionX;
@@ -618,22 +645,19 @@
                     }
                 }
 
-                // Add Burst Energy (Dissolve effect)
+                // Burst Energy
                 if (globalBurst > 0.1) {
                     this.vx += (Math.random() - 0.5) * globalBurst;
                     this.vy += (Math.random() - 0.5) * globalBurst;
                 }
 
-                // Chaos / Brownian Motion Simulation
+                // Chaos
                 this.vx += (Math.random() - 0.5) * particleConfig.chaos;
                 this.vy += (Math.random() - 0.5) * particleConfig.chaos;
                 
-                // Dynamic Speed Clamping
-                // Allow higher speeds during bursts, then clamp down
                 const burstMultiplier = 1 + (globalBurst * 2); 
                 const maxSpeed = particleConfig.speed * 3 * burstMultiplier;
                 
-                // Soft friction
                 this.vx *= 0.98; 
                 this.vy *= 0.98;
 
@@ -645,7 +669,7 @@
                 this.x += this.vx;
                 this.y += this.vy;
 
-                // Boundaries (Wrap around)
+                // Wrap
                 if (this.x < 0) this.x = width;
                 if (this.x > width) this.x = 0;
                 if (this.y < 0) this.y = height;
@@ -655,15 +679,16 @@
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${particleConfig.color}, ${0.8 - (globalBurst/20)})`; // Fade out during burst
+                // Grayscale Particles: Alpha changes based on burst
+                ctx.fillStyle = `rgba(${particleConfig.color}, ${0.7 - (globalBurst/20)})`; 
                 ctx.fill();
             }
         }
 
         function initParticles() {
             particles = [];
-            let count = (width * height) / 15000; // Density based on screen size
-            if (count > 150) count = 150; // Cap
+            let count = (width * height) / 13000; 
+            if (count > 200) count = 200; 
             for (let i = 0; i < count; i++) {
                 particles.push(new Particle());
             }
@@ -672,15 +697,12 @@
         function animate() {
             ctx.clearRect(0, 0, width, height);
             
-            // Decay global burst energy
             globalBurst = globalBurst * 0.9;
 
             for (let i = 0; i < particles.length; i++) {
                 particles[i].update();
                 particles[i].draw();
 
-                // Connectivity
-                // During high burst (dissolve), connections break (max distance effectively shrinks or we skip)
                 if (particleConfig.connectivity > 0 && globalBurst < 5) {
                     for (let j = i; j < particles.length; j++) {
                         let dx = particles[i].x - particles[j].x;
@@ -689,7 +711,8 @@
 
                         if (distance < particleConfig.connectivity) {
                             ctx.beginPath();
-                            ctx.strokeStyle = `rgba(${particleConfig.color}, ${1 - distance/particleConfig.connectivity})`;
+                            // Grayscale lines
+                            ctx.strokeStyle = `rgba(${particleConfig.color}, ${0.15 * (1 - distance/particleConfig.connectivity)})`;
                             ctx.lineWidth = 0.5;
                             ctx.moveTo(particles[i].x, particles[i].y);
                             ctx.lineTo(particles[j].x, particles[j].y);
@@ -701,7 +724,6 @@
             requestAnimationFrame(animate);
         }
 
-        // Mouse Listeners
         window.addEventListener('mousemove', (e) => {
             mouse.x = e.x;
             mouse.y = e.y;
@@ -711,16 +733,12 @@
 
         function updateSlide(direction) {
             const data = slides[currentSlide];
-            
-            // Trigger Particle Explosion (Dissolve)
             globalBurst = 20; 
 
-            // Update UI
-            // We use opacity fade out first if desired, but replacing innerHTML with CSS animation handles it
-            
+            // Header Logic
             let mainHeading = '';
             if (data.h1) {
-                mainHeading = `<h1 class="${data.theme === 'red' ? 'glitch-effect' : ''}" style="color: ${data.theme === 'red' ? 'var(--accent-red)' : (data.theme === 'gold' ? 'var(--accent-gold)' : 'var(--text-main)')}">${data.h1}</h1>`;
+                mainHeading = `<h1 class="${data.theme === 'danger' ? 'glitch-effect' : ''}">${data.h1}</h1>`;
             } else if (data.h2) {
                 mainHeading = `<h2>${data.h2}</h2>`;
             }
@@ -738,29 +756,29 @@
                 </div>
             `;
             
-            // Inject new content
             injector.innerHTML = slideHTML;
 
-            // Update Progress
             const pct = ((currentSlide + 1) / slides.length) * 100;
             progressBar.style.width = `${pct}%`;
             counter.innerText = `${String(currentSlide + 1).padStart(2, '0')} / ${slides.length}`;
 
-            // Update Physics Engine Config
-            let targetColor = '0, 243, 255'; // Cyan default
-            if (data.theme === 'red') targetColor = '255, 42, 42';
-            if (data.theme === 'gold') targetColor = '255, 200, 0';
-            if (data.theme === 'purple') targetColor = '188, 19, 254';
+            // Grayscale Theme Logic
+            let targetColor = '255, 255, 255'; 
+            
+            // In grayscale mode, we distinguish by "feel" not color hue
+            if (data.theme === 'danger') {
+                particleConfig.connectivity = 0; // Broken connections = danger
+            } else if (data.theme === 'metal') {
+                particleConfig.connectivity = 200; // Rigid connections = metal/structure
+                targetColor = '200, 200, 200';
+            } else {
+                particleConfig.connectivity = 150;
+                targetColor = '255, 255, 255';
+            }
 
             particleConfig.color = targetColor;
             particleConfig.chaos = data.chaos;
             particleConfig.speed = (data.chaos * 2) + 0.5;
-            
-            if (data.theme === 'red') {
-                particleConfig.connectivity = 0; 
-            } else {
-                particleConfig.connectivity = 150;
-            }
         }
 
         function nextSlide() {
@@ -777,17 +795,14 @@
             }
         }
 
-        // Keyboard Nav
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
             if (e.key === 'ArrowLeft') prevSlide();
         });
 
-        // Init
         resize();
         animate();
-        updateSlide(); // Start
+        updateSlide();
     </script>
 </body>
 </html>
-
