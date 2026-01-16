@@ -9,18 +9,17 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* MONOCHROME PALETTE */
-            --bg-color: #050505;
-            --accent-primary: #ffffff;
-            --accent-secondary: #a0a0a0;
-            --accent-dim: #404040;
+            /* PURE MONOCHROME */
+            --bg-color: #020202;
+            --white: #ffffff;
+            --silver: #8c8c8c;
+            --dim: #333333;
+            --tiffany: #0ABAB5; /* Tiffany Blue Accent */
             
-            --text-main: #f0f0f0;
-            --text-muted: #888888;
+            --panel-bg: rgba(5, 5, 5, 0.85);
+            --panel-border: rgba(255, 255, 255, 0.1);
             
-            --panel-bg: rgba(15, 15, 15, 0.85);
-            --panel-border: rgba(255, 255, 255, 0.15);
-            --panel-border-active: rgba(255, 255, 255, 0.4);
+            --blur-amount: 20px;
         }
 
         * {
@@ -31,7 +30,7 @@
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-main);
+            color: var(--white);
             font-family: 'Rajdhani', sans-serif;
             overflow: hidden;
             height: 100vh;
@@ -42,767 +41,578 @@
         }
 
         /* CANVAS LAYER */
-        #quantum-canvas {
+        #flow-canvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 1;
-            /* Lower contrast for background particles to keep text crisp */
-            opacity: 0.6; 
         }
 
         /* UI LAYER */
         #ui-layer {
             position: relative;
             z-index: 10;
-            /* INCREASED REAL ESTATE */
-            width: 95%; 
-            max-width: 1600px; 
-            height: 85vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* Center vertically */
+            width: 90%; 
+            max-width: 1400px; /* Reduced max width for tighter focus */
+            height: 80vh;
             pointer-events: none; 
         }
 
-        /* SLIDE CONTAINER */
+        /* SLIDE TRANSITIONS */
         .slide-container {
-            background: var(--panel-bg);
-            backdrop-filter: blur(20px); /* Heavy blur for clean text */
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--panel-border);
-            padding: 4rem; /* More padding */
-            border-radius: 2px; /* Sharper corners */
-            position: relative;
-            opacity: 0;
-            transform: scale(0.98);
-            transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            pointer-events: auto;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.8);
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr; /* More space for text */
-            gap: 80px;
-            height: 100%;
-            align-items: center;
-        }
-
-        .slide-container.active {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .text-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 100%;
-        }
-
-        .visual-content {
-            border-left: 1px solid var(--panel-border);
-            padding-left: 80px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-
-        /* TYPOGRAPHY - CLEAN & CRISP */
-        h1 {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 2rem; /* Larger Title */
-            line-height: 0.9;
-            font-weight: 300;
-            text-transform: uppercase;
-            letter-spacing: -1px;
-            margin-bottom: 1.5rem;
-            color: var(--accent-primary);
-        }
-
-        h2 {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.5rem; /* Larger Headers */
-            font-weight: 400;
-            margin-bottom: 1.5rem;
-            color: var(--accent-primary);
-            letter-spacing: -0.5px;
-        }
-
-        h3 {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 2rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border-bottom: 1px solid var(--panel-border);
-            padding-bottom: 10px;
-            display: inline-block;
-            width: fit-content;
-        }
-
-        p {
-            font-size: 1rem; /* Larger Body Text */
-            line-height: 1.5;
-            color: var(--text-main);
-            margin-bottom: 2rem;
-            font-weight: 300;
-            max-width: 90%;
-        }
-
-        .highlight {
-            color: var(--accent-primary);
-            font-weight: 600;
-            border-bottom: 1px solid var(--accent-primary);
-        }
-
-        .danger {
-            color: var(--accent-primary);
-            background: var(--text-main); /* Inverted for impact in grayscale */
-            color: black;
-            padding: 0 5px;
-            font-weight: 700;
-        }
-
-        ul {
-            list-style: none;
-        }
-
-        li {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1rem;
-            margin-bottom: 1.2rem;
-            padding-left: 2rem;
-            position: relative;
-            color: var(--text-muted);
-        }
-
-        li::before {
-            content: '>';
-            position: absolute;
-            left: 0;
-            color: var(--accent-primary);
-            font-weight: 700;
-        }
-
-        /* DATA VIZ ELEMENTS - MONOCHROME */
-        .metric-box {
-            border: 1px solid var(--panel-border);
-            padding: 30px;
-            background: rgba(255,255,255,0.02);
-            margin-bottom: 20px;
-            width: 100%;
-            transition: border-color 0.3s;
-        }
-        .metric-box:hover {
-            border-color: var(--accent-primary);
-        }
-
-        .metric-val {
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: var(--accent-primary);
-            letter-spacing: -2px;
-        }
-
-        .metric-label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-top: 5px;
-        }
-
-        /* NAVIGATION */
-        .nav-zones {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 20;
+            
+            background: var(--panel-bg);
+            /* Glass border only on left/right to mimic opening */
+            border-left: 1px solid var(--panel-border);
+            border-right: 1px solid var(--panel-border);
+            
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr; 
+            gap: 60px;
+            padding: 0 5%;
+            align-items: center;
+            
+            pointer-events: auto;
+            
+            /* COALESCE ANIMATION STATE */
+            opacity: 0;
+            filter: blur(var(--blur-amount));
+            transform: scale(1.02);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .slide-container.active {
+            opacity: 1;
+            filter: blur(0px); /* Coalesce to sharp */
+            transform: scale(1);
+        }
+
+        /* DIGITAL WALL DIVIDER */
+        .visual-content {
+            height: 70%;
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
+            padding-left: 60px;
             display: flex;
-            justify-content: space-between;
-            pointer-events: none;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
         }
         
-        .nav-btn {
-            width: 120px;
+        /* The glowing line in the UI matching the physics wall */
+        .visual-content::before {
+            content: '';
+            position: absolute;
+            left: -2px;
+            top: 0;
             height: 100%;
+            width: 2px;
+            background: linear-gradient(180deg, transparent, var(--tiffany), transparent);
+            box-shadow: 0 0 15px var(--tiffany);
+            opacity: 0.8;
+        }
+
+        /* TYPOGRAPHY - UPDATED SIZES */
+        h1 {
+            font-size: 3.5rem; /* Reduced from 5.5rem */
+            line-height: 1.1;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+            background: linear-gradient(90deg, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 2.5rem; /* Reduced from 3.5rem */
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--white);
+            letter-spacing: -0.5px;
+        }
+
+        h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--tiffany);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            pointer-events: auto;
-            transition: all 0.3s ease;
-            color: var(--accent-dim);
-            /* Subtle gradients for hover zones */
-            background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+            gap: 10px;
+        }
+        
+        h3::before {
+            content: '';
+            width: 20px;
+            height: 1px;
+            background: var(--tiffany);
         }
 
-        .nav-btn.next {
-            background: linear-gradient(-90deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+        p {
+            font-size: 1.1rem; /* Reduced from 1.4rem */
+            line-height: 1.6;
+            color: #d1d1d1;
+            margin-bottom: 2rem;
+            font-weight: 400;
+            max-width: 90%;
+            text-align: left;
         }
 
-        .nav-btn:hover {
-            color: var(--accent-primary);
+        /* GLITCH TEXT EFFECT */
+        .glitch-text {
+            position: relative;
         }
-
-        .nav-btn svg {
-            width: 40px;
-            height: 40px;
-            fill: currentColor;
-            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-        }
-
-        .nav-btn:hover svg {
-            transform: scale(1.2);
-        }
-
-        .progress-bar {
+        .glitch-text::after {
+            content: attr(data-text);
             position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 2px;
-            background: var(--accent-primary);
-            width: 0%;
-            transition: width 0.5s ease;
+            left: 2px;
+            text-shadow: -1px 0 var(--tiffany);
+            top: 0;
+            color: white;
+            background: black;
+            overflow: hidden;
+            clip: rect(0, 900px, 0, 0); 
+            animation: noise-anim 2s infinite linear alternate-reverse;
+        }
+        @keyframes noise-anim {
+            0% { clip: rect(20px, 9999px, 21px, 0); }
+            5% { clip: rect(60px, 9999px, 80px, 0); }
+            10% { clip: rect(10px, 9999px, 80px, 0); }
+            100% { clip: rect(0, 0, 0, 0); }
         }
 
-        .slide-counter {
+        /* DATA VIZ ELEMENTS */
+        .metric-box {
+            border: 1px solid var(--dim);
+            padding: 30px;
+            background: rgba(0,0,0,0.5);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Scanline for metrics */
+        .metric-box::after {
+            content: '';
             position: absolute;
-            bottom: 40px;
-            right: 60px;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: rgba(10, 186, 181, 0.3); /* Tiffany tint */
+            animation: scan 3s linear infinite;
+        }
+        
+        @keyframes scan { 0% {top:0;} 100% {top:100%;} }
+
+        .metric-val {
+            font-size: 3rem; /* Reduced size */
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: -1px;
+        }
+
+        .metric-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--silver);
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        ul { list-style: none; }
+        li {
             font-family: 'JetBrains Mono', monospace;
             font-size: 1rem;
-            color: var(--text-muted);
-            z-index: 15;
-            pointer-events: none;
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--silver);
+        }
+        li::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: var(--tiffany);
+            font-weight: 700;
         }
 
-        /* UTILS */
-        .glitch-effect { 
-            animation: glitch 0.3s infinite; 
-            color: white;
-        }
-
-        @keyframes glitch {
-            0% { transform: translate(0); opacity: 1; }
-            20% { transform: translate(-2px, 2px); opacity: 0.8; }
-            40% { transform: translate(-2px, -2px); opacity: 1; }
-            60% { transform: translate(2px, 2px); opacity: 0.8; }
-            80% { transform: translate(2px, -2px); opacity: 1; }
-            100% { transform: translate(0); opacity: 1; }
-        }
-
-        /* Image Placeholder styling */
         .img-placeholder {
             width: 100%;
             height: 250px;
             background: repeating-linear-gradient(
-                45deg,
-                rgba(255,255,255,0.03),
-                rgba(255,255,255,0.03) 10px,
-                rgba(255,255,255,0.05) 10px,
-                rgba(255,255,255,0.05) 20px
+                90deg,
+                rgba(255,255,255,0.02),
+                rgba(255,255,255,0.02) 1px,
+                transparent 1px,
+                transparent 20px
             );
+            border: 1px solid var(--dim);
             display: flex;
             justify-content: center;
             align-items: center;
-            border: 1px solid var(--panel-border);
-            margin-bottom: 20px;
-            color: var(--text-main);
             font-family: 'JetBrains Mono', monospace;
-            text-transform: uppercase;
+            color: var(--silver);
+            font-size: 0.9rem;
+        }
+
+        /* NAVIGATION ZONES */
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 50;
+            background: rgba(0,0,0,0.8);
+            transition: all 0.3s;
+        }
+        .nav-btn:hover {
+            border-color: var(--tiffany);
+            background: rgba(10, 186, 181, 0.1);
+        }
+        .nav-btn:hover svg {
+            fill: var(--tiffany);
+        }
+        .nav-btn.prev { left: 30px; }
+        .nav-btn.next { right: 30px; }
+        .nav-btn svg { width: 24px; height: 24px; fill: #fff; transition: fill 0.3s; }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 40px;
+            left: 5%;
+            height: 1px;
+            background: var(--dim);
+            width: 90%;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--tiffany);
+            width: 0%;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px var(--tiffany);
+        }
+        
+        .counter {
+            position: absolute;
+            bottom: 20px;
+            right: 5%;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--silver);
         }
 
     </style>
 </head>
 <body>
 
-    <!-- BACKGROUND ENGINE -->
-    <canvas id="quantum-canvas"></canvas>
+    <canvas id="flow-canvas"></canvas>
 
-    <!-- UI & CONTENT -->
     <div id="ui-layer">
-        <div id="slide-injector" style="height: 100%;"></div>
+        <div id="slide-injector"></div>
     </div>
 
-    <!-- CONTROLS -->
-    <div class="nav-zones">
-        <div class="nav-btn prev" onclick="prevSlide()">
-            <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-        </div>
-        <div class="nav-btn next" onclick="nextSlide()">
-            <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
-        </div>
+    <div class="nav-btn prev" onclick="changeSlide(-1)">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </div>
+    <div class="nav-btn next" onclick="changeSlide(1)">
+        <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
     </div>
 
-    <div class="progress-bar" id="progress"></div>
-    <div class="slide-counter" id="counter">01 / 25</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div class="counter" id="counter">01 / 25</div>
 
     <script>
-        // --- DATA SOURCE ---
+        // --- DATA ---
         const slides = [
-            {
-                type: "intro",
-                h3: "Strategic Investment Memorandum",
-                h1: "PROJECT CHIMERA",
-                p: "Quantum Penetration Testing as a Service.<br>Defense by Simulation. Security by Chaos.",
-                visual: `<div class="metric-val">SEED ROUND</div><div class="metric-label">Seeking $4M @ $25M CAP</div>`,
-                theme: "default",
-                chaos: 0.2
-            },
-            {
-                type: "standard",
-                h3: "01. Executive Summary",
-                h2: "The Investment Thesis",
-                p: "We are navigating the largest cryptographic discontinuity in history: Post-Quantum Cryptography (PQC).",
-                visual: `<div class="metric-box"><div class="metric-val">HNDL</div><div class="metric-label">Harvest Now, Decrypt Later</div></div>`,
-                theme: "default",
-                chaos: 0.3
-            },
-            {
-                type: "standard",
-                h3: "02. The Problem",
-                h2: "The Quantum Blind Spot",
-                p: "NIST standards (FIPS 203/204) are based on Math. <span class='danger'>Real attacks are Physics.</span>",
-                visual: `<div class="img-placeholder" style="border-color: white"><span>MATH != PHYSICS</span></div>`,
-                theme: "danger",
-                chaos: 0.8
-            },
-            {
-                type: "standard",
-                h3: "03. The Reality",
-                h2: "HNDL Threat",
-                p: "Data harvested today—genomics, intel, financial obligations—is already compromised if a quantum computer breaks encryption in 2030.",
-                visual: `<ul><li>Q-Day Risk Window: Opens ~2030</li><li>Data Shelf-Life: >10 Years</li><li>Status: <span class="danger">Compromised</span></li></ul>`,
-                theme: "danger",
-                chaos: 0.9
-            },
-            {
-                type: "standard",
-                h3: "04. The Solution",
-                h2: "Project Chimera",
-                p: "We introduce <strong>QPaaS</strong>: Quantum Penetration Testing as a Service. We don't defend by algorithm; we defend by simulation.",
-                visual: `<div class="metric-box"><div class="metric-val">Offensive</div><div class="metric-label">Simulation Paradigm</div></div>`,
-                theme: "default",
-                chaos: 0.2
-            },
-            {
-                type: "standard",
-                h3: "05. Core Innovation",
-                h2: "Simulated Chaos",
-                p: "We solve Langevin Stochastic Differential Equations (SDEs) to mimic the noise fingerprints of quantum attacks.",
-                visual: `<div class="img-placeholder">dX_t = -∇V(X_t)dt + √2D dW_t</div>`,
-                theme: "default",
-                chaos: 0.4
-            },
-            {
-                type: "standard",
-                h3: "06. Architecture",
-                h2: "The Trinity",
-                p: "Three interconnected modules forming a recursive adversarial loop.",
-                visual: `<ul><li>PETRI: The Environment</li><li>SENTINEL: The Hunter</li><li>ORACLE: The Judge</li></ul>`,
-                theme: "metal",
-                chaos: 0.5
-            },
-            {
-                type: "standard",
-                h3: "07. Module 01",
-                h2: "PETRI",
-                p: "A classical physics engine generating entropy landscapes. Models decoherence (T1/T2 relaxation).",
-                visual: `<div class="metric-box"><div class="metric-val">10^9</div><div class="metric-label">Particle Steps / Sec</div></div>`,
-                theme: "default",
-                chaos: 0.6
-            },
-            {
-                type: "standard",
-                h3: "08. Module 02",
-                h2: "SENTINEL",
-                p: "Adversarial AI Swarm. Reinforcement Learning agents trained to predict 'random' trajectories.",
-                visual: `<div class="metric-box"><div class="metric-val">PPO + Transformers</div><div class="metric-label">Neural Architecture</div></div>`,
-                theme: "danger",
-                chaos: 0.7
-            },
-            {
-                type: "standard",
-                h3: "09. Module 03",
-                h2: "ORACLE",
-                p: "Quantum-resistant distributed ledger (DAG). Issues the 'Certificate of Chaos' for compliance.",
-                visual: `<div class="metric-box"><div class="metric-val">FIPS 204</div><div class="metric-label">Compliance Standard</div></div>`,
-                theme: "metal",
-                chaos: 0.1
-            },
-            {
-                type: "standard",
-                h3: "10. The Moat",
-                h2: "PetriCorp Ecosystem",
-                p: "We are not starting from scratch. We leverage shared IP from sister platforms.",
-                visual: `<ul><li>Helix (Bio): Physics AI</li><li>Nexus (Sim): RL Agents</li><li>Quantum (Lab): Noise Models</li></ul>`,
-                theme: "metal",
-                chaos: 0.3
-            },
-            {
-                type: "standard",
-                h3: "11. Validation",
-                h2: "Scientific Basis",
-                p: "Helix platform achieved 95% accuracy on CASP15. We are repurposing that 'Differentiable Docking' engine for crypto-analysis.",
-                visual: `<div class="img-placeholder">Proven IP Transfer</div>`,
-                theme: "metal",
-                chaos: 0.2
-            },
-            {
-                type: "standard",
-                h3: "12. Market Dynamics",
-                h2: "The Catalyst",
-                p: "NIST FIPS 203, 204, 205 finalized August 2024. Mandates for Federal Agencies & Defense.",
-                visual: `<div class="metric-box"><div class="metric-val">Regulatory</div><div class="metric-label">Forced Buyer Market</div></div>`,
-                theme: "default",
-                chaos: 0.1
-            },
-            {
-                type: "standard",
-                h3: "13. Market Size",
-                h2: "$10 Billion TAM",
-                p: "Projected by 2030 with a CAGR of ~40%. BFSI and Defense are the primary drivers.",
-                visual: `<div class="metric-box"><div class="metric-val">$10B</div><div class="metric-label">Total Addressable Market</div></div>`,
-                theme: "metal",
-                chaos: 0.2
-            },
-            {
-                type: "standard",
-                h3: "14. Competition",
-                h2: "SandboxAQ",
-                p: "The Generalist Goliath ($5.75B Val). They sell implementation. We sell the *Audit*.",
-                visual: `<ul><li>Them: Full Stack / Generalist</li><li>Us: Specialized Red Team</li><li>Strategy: Becoming the Audit Standard</li></ul>`,
-                theme: "danger",
-                chaos: 0.5
-            },
-            {
-                type: "standard",
-                h3: "15. Competition",
-                h2: "PQShield & QuSecure",
-                p: "Implementation providers. Potential partners who need our 'Certificate of Chaos' to validate their claims.",
-                visual: `<div class="img-placeholder">Partner Ecosystem</div>`,
-                theme: "default",
-                chaos: 0.3
-            },
-            {
-                type: "standard",
-                h3: "16. Financials",
-                h2: "Transaction Overview",
-                p: "We are raising capital to fund a 12-month engineering sprint.",
-                visual: `<div class="metric-box"><div class="metric-val">$4,000,000</div><div class="metric-label">Raise Amount (SAFE)</div></div>`,
-                theme: "metal",
-                chaos: 0.1
-            },
-            {
-                type: "standard",
-                h3: "17. Valuation",
-                h2: "The Terms",
-                p: "$25M Post-Money Valuation Cap. A compelling entry for Deep Tech infrastructure.",
-                visual: `<div class="metric-box"><div class="metric-val">~20 Months</div><div class="metric-label">Runway</div></div>`,
-                theme: "metal",
-                chaos: 0.1
-            },
-            {
-                type: "standard",
-                h3: "18. Use of Funds",
-                h2: "Allocation",
-                p: "Heavy investment in R&D and Infrastructure. We are building a digital wind tunnel.",
-                visual: `<ul><li>45%: Engineering Talent</li><li>30%: Compute (H100s)</li><li>15%: Security Audits</li><li>10%: Ops/IP</li></ul>`,
-                theme: "default",
-                chaos: 0.2
-            },
-            {
-                type: "standard",
-                h3: "19. Unit Economics",
-                h2: "Projections",
-                p: "Targeting $12M Revenue by Year 3 with 75% Gross Margins.",
-                visual: `<div class="metric-box"><div class="metric-val">$250k</div><div class="metric-label">Target ASP (Enterprise)</div></div>`,
-                theme: "metal",
-                chaos: 0.2
-            },
-            {
-                type: "standard",
-                h3: "20. Roadmap: Q1",
-                h2: "The Physics Engine",
-                p: "Critical Milestone: Scaling Petri to 10^9 particle steps/sec on NVIDIA H100s.",
-                visual: `<div class="img-placeholder">Phase: BUILD</div>`,
-                theme: "default",
-                chaos: 0.4
-            },
-            {
-                type: "standard",
-                h3: "21. Roadmap: Q2",
-                h2: "The Hunter",
-                p: "Training Sentinel Agents to predict standard PRNGs. Calibration phase.",
-                visual: `<div class="img-placeholder">Phase: TRAIN</div>`,
-                theme: "danger",
-                chaos: 0.5
-            },
-            {
-                type: "standard",
-                h3: "22. Roadmap: Q3",
-                h2: "Trinity Integration",
-                p: "Connecting Petri, Sentinel, and Oracle into a unified pipeline (Alpha Release).",
-                visual: `<div class="img-placeholder">Phase: INTEGRATE</div>`,
-                theme: "metal",
-                chaos: 0.3
-            },
-            {
-                type: "standard",
-                h3: "23. Roadmap: Q4",
-                h2: "Commercial Hardening",
-                p: "FIPS 140-3 readiness and launch of first paid pilot with a Tier-1 Custodian.",
-                visual: `<div class="img-placeholder">Phase: DEPLOY</div>`,
-                theme: "default",
-                chaos: 0.1
-            },
-            {
-                type: "standard",
-                h3: "24. Risk Assessment",
-                h2: "Key Risks",
-                p: "Simulation vs. Reality Gap. Mitigated by our deep expertise in Langevin dynamics from the Quantum Platform.",
-                visual: `<ul><li>Technical: Compute Scaling</li><li>Market: Regulatory Flux</li><li>Mitigation: PetriCorp Shared IP</li></ul>`,
-                theme: "danger",
-                chaos: 0.4
-            },
-            {
-                type: "intro",
-                h3: "Join the Round",
-                h1: "INVEST IN CHAOS",
-                p: "Help us build the quantum wind tunnel.<br>partners@petricorp.xyz",
-                visual: `<div class="metric-val">PROJECT CHIMERA</div>`,
-                theme: "default",
-                chaos: 0.05
-            }
+            { h3: "Investment Memo", h1: "PROJECT CHIMERA", p: "Quantum Penetration Testing as a Service.<br>Defense by Simulation.", visual: `<div class="metric-box"><div class="metric-val">SEED</div><div class="metric-label">$4M @ $25M Cap</div></div>` },
+            { h3: "Executive Summary", h2: "The Thesis", p: "Cryptographic infrastructure faces a discontinuity event. Post-Quantum Cryptography is mandatory, but implementation risks remain.", visual: `<div class="metric-box"><div class="metric-val">HNDL</div><div class="metric-label">Harvest Now, Decrypt Later</div></div>` },
+            { h3: "The Problem", h2: "Quantum Blind Spot", p: "NIST standards are based on Math. <span style='background:white; color:black; padding:0 4px;'>Real attacks are Physics.</span> We cannot defend what we cannot model.", visual: `<div class="img-placeholder">MATH != PHYSICS</div>` },
+            { h3: "The Solution", h2: "Project Chimera", p: "We introduce QPaaS. Instead of defensive libraries, we offer offensive simulation. We stress-test keys against quantum noise.", visual: `<div class="metric-box"><div class="metric-val">QPaaS</div><div class="metric-label">Penetration Testing</div></div>` },
+            { h3: "Core Tech", h2: "The Trinity", p: "A recursive loop: Petri (Environment), Sentinel (Attacker), and Oracle (Judge).", visual: `<ul><li>PETRI: Physics Engine</li><li>SENTINEL: AI Swarm</li><li>ORACLE: Ledger</li></ul>` },
+            { h3: "Deep Tech", h2: "Petri Engine", p: "Simulating Langevin SDEs to mimic decoherence. 10^9 particle steps per second on H100s.", visual: `<div class="metric-box"><div class="metric-val">10^9</div><div class="metric-label">Steps / Sec</div></div>` },
+            { h3: "Deep Tech", h2: "Sentinel Swarm", p: "Reinforcement Learning agents trained to predict entropy trajectories in the Petri environment.", visual: `<div class="img-placeholder">RL AGENT TRAINING</div>` },
+            { h3: "The Moat", h2: "Ecosystem IP", p: "Leveraging sister platforms: Helix (Bio-Compute) and Nexus (Simulation) for shared algorithms.", visual: `<ul><li>Shared Physics Kernels</li><li>Shared RL Libraries</li></ul>` },
+            { h3: "Market", h2: "The Catalyst", p: "NIST FIPS 203/204 finalized in 2024. Federal mandates force adoption.", visual: `<div class="metric-box"><div class="metric-val">2024</div><div class="metric-label">NIST Finalization</div></div>` },
+            { h3: "Market Size", h2: "$10B Opportunity", p: "Projected TAM by 2030. Driven by BFSI and Defense sectors requiring long-term data secrecy.", visual: `<div class="metric-box"><div class="metric-val">$10B</div><div class="metric-label">TAM 2030</div></div>` },
+            { h3: "Competition", h2: "Differentiation", p: "SandboxAQ is the generalist. PQShield is the shield. We are the stress test.", visual: `<div class="img-placeholder">VS. SANDBOX AQ</div>` },
+            { h3: "Financials", h2: "The Ask", p: "Raising $4M on a SAFE to fund a 12-month engineering sprint to scale the physics engine.", visual: `<div class="metric-box"><div class="metric-val">$4M</div><div class="metric-label">Seed Round</div></div>` },
+            { h3: "Roadmap", h2: "Q1: Build", p: "Scaling Petri to massive parallelization on GPU clusters.", visual: `<div class="metric-box"><div class="metric-val">Q1</div><div class="metric-label">Physics Scale</div></div>` },
+            { h3: "Roadmap", h2: "Q2: Train", p: "Calibrating Sentinel agents against standard PRNGs.", visual: `<div class="metric-box"><div class="metric-val">Q2</div><div class="metric-label">AI Calibration</div></div>` },
+            { h3: "Roadmap", h2: "Q3: Integrate", p: "The Trinity Loop (Alpha) goes live.", visual: `<div class="metric-box"><div class="metric-val">Q3</div><div class="metric-label">Alpha Launch</div></div>` },
+            { h3: "Conclusion", h1: "JOIN THE CHAOS", p: "Invest in the infrastructure of the post-quantum era.", visual: `<div class="metric-val">CHIMERA</div>` }
         ];
 
-        // --- APP STATE ---
-        let currentSlide = 0;
-        const injector = document.getElementById('slide-injector');
-        const progressBar = document.getElementById('progress');
-        const counter = document.getElementById('counter');
-
-        // --- PARTICLE ENGINE SETUP ---
-        const canvas = document.getElementById('quantum-canvas');
+        // --- ENGINE ---
+        const canvas = document.getElementById('flow-canvas');
         const ctx = canvas.getContext('2d');
-        let particles = [];
         let width, height;
-        let mouse = { x: null, y: null };
-        let globalBurst = 0; 
-        
-        let particleConfig = {
-            color: '255, 255, 255', // Pure white
-            speed: 0.5,
-            connectivity: 150,
-            chaos: 0.2,
-            count: 100
-        };
+        let particles = [];
+        let sentinels = [];
+        let wallX = 0; 
+        let shockwave = 0; 
 
-        // Resize Handling
+        // Colors
+        const COL_WHITE = 'rgba(255, 255, 255,';
+        const COL_TIFFANY = 'rgba(10, 186, 181,'; // 0ABAB5
+
         function resize() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
+            wallX = width * 0.6;
             initParticles();
         }
-        window.addEventListener('resize', resize);
 
-        // Particle Class
+        // Particle Types
+        const TYPE_FLOW = 0;     // White, attacking (left to right)
+        const TYPE_SENTINEL = 1; // Tiffany, hunting (seeks flow)
+        const TYPE_DEFENDER = 2; // Tiffany, converted (moves vertically)
+
         class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * particleConfig.speed;
-                this.vy = (Math.random() - 0.5) * particleConfig.speed;
-                this.size = Math.random() * 2 + 0.5; // Smaller, sharper particles
-                this.baseX = this.x;
-                this.baseY = this.y;
-                this.density = (Math.random() * 30) + 1;
+            constructor(type = TYPE_FLOW) {
+                this.type = type;
+                this.reset(true);
+            }
+
+            reset(initial = false) {
+                this.life = 1;
+                this.decay = Math.random() * 0.005 + 0.002;
+                
+                if (this.type === TYPE_FLOW) {
+                    this.x = initial ? Math.random() * width : 0;
+                    this.y = Math.random() * height;
+                    this.vx = Math.random() * 2 + 1; 
+                    this.vy = (Math.random() - 0.5) * 0.5;
+                    this.size = Math.random() * 1.5 + 0.5;
+                    this.colorRoot = COL_WHITE;
+                } else if (this.type === TYPE_SENTINEL) {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.vx = (Math.random() - 0.5) * 3;
+                    this.vy = (Math.random() - 0.5) * 3;
+                    this.size = 2.5; // Bigger
+                    this.colorRoot = COL_TIFFANY;
+                    this.decay = 0; // Sentinels don't die easily
+                } else if (this.type === TYPE_DEFENDER) {
+                    // Start at wall usually, or converted position
+                    this.x = wallX + (Math.random() * 20 - 10); 
+                    this.y = Math.random() * height;
+                    this.vx = 0;
+                    this.vy = (Math.random() - 0.5) * 4; // Fast vertical movement
+                    this.size = 1.5;
+                    this.colorRoot = COL_TIFFANY;
+                }
             }
 
             update() {
-                // Mouse Interaction
-                if (mouse.x) {
-                    let dx = mouse.x - this.x;
-                    let dy = mouse.y - this.y;
-                    let distance = Math.sqrt(dx*dx + dy*dy);
-                    let maxDistance = 200;
+                // 1. Logic based on Type
+                if (this.type === TYPE_FLOW) {
+                    this.x += this.vx;
+                    this.y += this.vy;
                     
-                    if (distance < maxDistance) {
-                        let forceDirectionX = dx / distance;
-                        let forceDirectionY = dy / distance;
-                        let force = (maxDistance - distance) / maxDistance;
-                        let directionX = forceDirectionX * force * this.density;
-                        let directionY = forceDirectionY * force * this.density;
-                        this.x -= directionX;
-                        this.y -= directionY;
+                    // Interaction with Wall
+                    let distToWall = Math.abs(this.x - wallX);
+                    if (distToWall < 50) {
+                        this.vy += (Math.random() - 0.5) * 0.5;
+                        this.vx *= 0.95;
+                    }
+                    
+                    // Reset
+                    this.life -= this.decay;
+                    if (this.x > width || this.life <= 0) this.reset();
+                    
+                } else if (this.type === TYPE_SENTINEL) {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    
+                    // Bounce off edges
+                    if (this.x < 0 || this.x > width) this.vx *= -1;
+                    if (this.y < 0 || this.y > height) this.vy *= -1;
+
+                    // HUNT: Find nearby Flow particles
+                    // Simple optimization: Just check random subset or rely on chance
+                    // But for effect, let's scan a small radius
+                    // Note: In a real heavy app we'd use a quadtree. Here we rely on array order.
+                } else if (this.type === TYPE_DEFENDER) {
+                    this.x += this.vx; // Should be near 0
+                    this.y += this.vy;
+                    
+                    // Keep near wall
+                    let drift = this.x - wallX;
+                    this.vx -= drift * 0.05; // Spring back to wall
+                    
+                    // Bounce vertical
+                    if (this.y < 0 || this.y > height) this.vy *= -1;
+                }
+
+                // 2. Shockwave Interaction (All types affected)
+                if (shockwave > 0) {
+                    let dx = this.x - wallX;
+                    let dy = this.y - (height/2);
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    if (Math.abs(dist - shockwave) < 100) {
+                        let force = (100 - Math.abs(dist - shockwave)) / 100;
+                        let angle = Math.atan2(dy, dx);
+                        this.vx += Math.cos(angle) * force * 2;
+                        this.vy += Math.sin(angle) * force * 2;
                     }
                 }
-
-                // Burst Energy
-                if (globalBurst > 0.1) {
-                    this.vx += (Math.random() - 0.5) * globalBurst;
-                    this.vy += (Math.random() - 0.5) * globalBurst;
-                }
-
-                // Chaos
-                this.vx += (Math.random() - 0.5) * particleConfig.chaos;
-                this.vy += (Math.random() - 0.5) * particleConfig.chaos;
-                
-                const burstMultiplier = 1 + (globalBurst * 2); 
-                const maxSpeed = particleConfig.speed * 3 * burstMultiplier;
-                
-                this.vx *= 0.98; 
-                this.vy *= 0.98;
-
-                if(this.vx > maxSpeed) this.vx = maxSpeed;
-                if(this.vx < -maxSpeed) this.vx = -maxSpeed;
-                if(this.vy > maxSpeed) this.vy = maxSpeed;
-                if(this.vy < -maxSpeed) this.vy = -maxSpeed;
-
-                this.x += this.vx;
-                this.y += this.vy;
-
-                // Wrap
-                if (this.x < 0) this.x = width;
-                if (this.x > width) this.x = 0;
-                if (this.y < 0) this.y = height;
-                if (this.y > height) this.y = 0;
             }
 
             draw() {
+                let alpha = this.life;
+                if (this.type === TYPE_SENTINEL) alpha = 0.8;
+                if (this.type === TYPE_DEFENDER) alpha = 0.6;
+
+                // Wall Glow override
+                let distToWall = Math.abs(this.x - wallX);
+                if (this.type === TYPE_FLOW && distToWall < 20) alpha = 1;
+
+                ctx.fillStyle = `${this.colorRoot} ${alpha})`;
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                // Grayscale Particles: Alpha changes based on burst
-                ctx.fillStyle = `rgba(${particleConfig.color}, ${0.7 - (globalBurst/20)})`; 
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
                 ctx.fill();
             }
         }
 
         function initParticles() {
             particles = [];
-            let count = (width * height) / 13000; 
-            if (count > 200) count = 200; 
-            for (let i = 0; i < count; i++) {
-                particles.push(new Particle());
-            }
+            
+            // 1. Flow Particles (Attackers)
+            for(let i=0; i<600; i++) particles.push(new Particle(TYPE_FLOW));
+            
+            // 2. Sentinels (Adversarial/Tiffany)
+            for(let i=0; i<15; i++) particles.push(new Particle(TYPE_SENTINEL));
         }
 
         function animate() {
-            ctx.clearRect(0, 0, width, height);
-            
-            globalBurst = globalBurst * 0.9;
+            ctx.fillStyle = 'rgba(2, 2, 2, 0.2)'; 
+            ctx.fillRect(0, 0, width, height);
 
+            // Draw Wall Line
+            ctx.strokeStyle = 'rgba(10, 186, 181, 0.1)'; // Tiffany tint
+            ctx.beginPath();
+            ctx.moveTo(wallX, 0);
+            ctx.lineTo(wallX, height);
+            ctx.stroke();
+
+            if (shockwave > 0) {
+                shockwave += 30; 
+                if (shockwave > width * 1.5) shockwave = 0; 
+            }
+
+            // Logic Loop
+            // We separate update and draw to handle collision logic
             for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
+                let p = particles[i];
+                p.update();
+                p.draw();
 
-                if (particleConfig.connectivity > 0 && globalBurst < 5) {
-                    for (let j = i; j < particles.length; j++) {
-                        let dx = particles[i].x - particles[j].x;
-                        let dy = particles[i].y - particles[j].y;
-                        let distance = Math.sqrt(dx * dx + dy * dy);
+                // Sentinel Interaction Logic
+                // If this is a Sentinel, check collisions with Flow particles
+                if (p.type === TYPE_SENTINEL) {
+                    for (let j = 0; j < particles.length; j++) {
+                        let other = particles[j];
+                        if (other.type === TYPE_FLOW) {
+                            let dx = p.x - other.x;
+                            let dy = p.y - other.y;
+                            let dist = Math.sqrt(dx*dx + dy*dy);
+                            
+                            // "STEAL" Range
+                            if (dist < 50) {
+                                // Attraction force (Magnetism)
+                                other.vx += (dx / dist) * 0.5;
+                                other.vy += (dy / dist) * 0.5;
 
-                        if (distance < particleConfig.connectivity) {
-                            ctx.beginPath();
-                            // Grayscale lines
-                            ctx.strokeStyle = `rgba(${particleConfig.color}, ${0.15 * (1 - distance/particleConfig.connectivity)})`;
-                            ctx.lineWidth = 0.5;
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.stroke();
+                                // CONVERT if very close
+                                if (dist < 10) {
+                                    other.type = TYPE_DEFENDER;
+                                    other.colorRoot = COL_TIFFANY;
+                                    other.vx = 0;
+                                    other.vy = (Math.random() < 0.5 ? 1 : -1) * (Math.random() * 3 + 2);
+                                    other.decay = 0; // Defenders persist longer
+                                    other.life = 1;
+                                }
+                            }
                         }
                     }
                 }
             }
+
             requestAnimationFrame(animate);
         }
 
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.x;
-            mouse.y = e.y;
-        });
+        // --- SLIDE LOGIC ---
+        let currentIndex = 0;
+        const injector = document.getElementById('slide-injector');
+        const progressFill = document.getElementById('progress');
+        const counter = document.getElementById('counter');
 
-        // --- RENDER LOGIC ---
+        function renderSlide(index) {
+            const d = slides[index];
+            shockwave = 10; 
+            
+            let headerHTML = d.h1 
+                ? `<h1 class="glitch-text" data-text="${d.h1}">${d.h1}</h1>`
+                : `<h2 class="glitch-text" data-text="${d.h2}">${d.h2}</h2>`;
 
-        function updateSlide(direction) {
-            const data = slides[currentSlide];
-            globalBurst = 20; 
-
-            // Header Logic
-            let mainHeading = '';
-            if (data.h1) {
-                mainHeading = `<h1 class="${data.theme === 'danger' ? 'glitch-effect' : ''}">${data.h1}</h1>`;
-            } else if (data.h2) {
-                mainHeading = `<h2>${data.h2}</h2>`;
-            }
-
-            const slideHTML = `
-                <div class="slide-container active">
+            const html = `
+                <div class="slide-container">
                     <div class="text-content">
-                        <h3>${data.h3}</h3>
-                        ${mainHeading}
-                        <p>${data.p}</p>
+                        <h3>${d.h3}</h3>
+                        ${headerHTML}
+                        <p>${d.p}</p>
                     </div>
                     <div class="visual-content">
-                        ${data.visual}
+                        ${d.visual}
                     </div>
                 </div>
             `;
             
-            injector.innerHTML = slideHTML;
+            injector.innerHTML = html;
+            const el = injector.querySelector('.slide-container');
+            void el.offsetWidth; 
+            el.classList.add('active');
 
-            const pct = ((currentSlide + 1) / slides.length) * 100;
-            progressBar.style.width = `${pct}%`;
-            counter.innerText = `${String(currentSlide + 1).padStart(2, '0')} / ${slides.length}`;
-
-            // Grayscale Theme Logic
-            let targetColor = '255, 255, 255'; 
-            
-            // In grayscale mode, we distinguish by "feel" not color hue
-            if (data.theme === 'danger') {
-                particleConfig.connectivity = 0; // Broken connections = danger
-            } else if (data.theme === 'metal') {
-                particleConfig.connectivity = 200; // Rigid connections = metal/structure
-                targetColor = '200, 200, 200';
-            } else {
-                particleConfig.connectivity = 150;
-                targetColor = '255, 255, 255';
-            }
-
-            particleConfig.color = targetColor;
-            particleConfig.chaos = data.chaos;
-            particleConfig.speed = (data.chaos * 2) + 0.5;
+            progressFill.style.width = ((index + 1) / slides.length * 100) + '%';
+            counter.innerText = `${String(index + 1).padStart(2,'0')} / ${slides.length}`;
         }
 
-        function nextSlide() {
-            if (currentSlide < slides.length - 1) {
-                currentSlide++;
-                updateSlide('next');
+        function changeSlide(dir) {
+            const next = currentIndex + dir;
+            if (next >= 0 && next < slides.length) {
+                currentIndex = next;
+                renderSlide(currentIndex);
             }
         }
 
-        function prevSlide() {
-            if (currentSlide > 0) {
-                currentSlide--;
-                updateSlide('prev');
-            }
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
-            if (e.key === 'ArrowLeft') prevSlide();
-        });
-
+        // INIT
+        window.addEventListener('resize', resize);
         resize();
         animate();
-        updateSlide();
+        renderSlide(0);
+
+        document.addEventListener('keydown', e => {
+            if(e.key === 'ArrowRight' || e.key === ' ') changeSlide(1);
+            if(e.key === 'ArrowLeft') changeSlide(-1);
+        });
+
     </script>
 </body>
 </html>
+
+
