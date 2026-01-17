@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Chimera | Investment Memorandum</title>
+    <title>Project Lattice | Investment Memorandum</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -339,22 +339,22 @@
     <script>
         // --- DATA ---
         const slides = [
-            { h3: "Investment Memo", h1: "PROJECT CHIMERA", p: "Quantum Penetration Testing as a Service.<br>Defense by Simulation.", visual: `<div class="metric-box"><div class="metric-val">SEED</div><div class="metric-label">$4M @ $25M Cap</div></div>` },
+            { h3: "Investment Memo", h1: "PROJECT LATTICE", p: "Quantum Penetration Testing as a Service.<br>Defense by Simulation.", visual: `<div class="metric-box"><div class="metric-val">SEED</div><div class="metric-label">$4M @ $25M Cap</div></div>` },
             { h3: "Executive Summary", h2: "The Thesis", p: "Cryptographic infrastructure faces a discontinuity event. Post-Quantum Cryptography is mandatory, but implementation risks remain.", visual: `<div class="metric-box"><div class="metric-val">HNDL</div><div class="metric-label">Harvest Now, Decrypt Later</div></div>` },
             { h3: "The Problem", h2: "Quantum Blind Spot", p: "NIST standards are based on Math. <span style='background:white; color:black; padding:0 4px;'>Real attacks are Physics.</span> We cannot defend what we cannot model.", visual: `<div class="img-placeholder">MATH != PHYSICS</div>` },
-            { h3: "The Solution", h2: "Project Chimera", p: "We introduce QPaaS. Instead of defensive libraries, we offer offensive simulation. We stress-test keys against quantum noise.", visual: `<div class="metric-box"><div class="metric-val">QPaaS</div><div class="metric-label">Penetration Testing</div></div>` },
-            { h3: "Core Tech", h2: "The Trinity", p: "A recursive loop: Petri (Environment), Sentinel (Attacker), and Oracle (Judge).", visual: `<ul><li>PETRI: Physics Engine</li><li>SENTINEL: AI Swarm</li><li>ORACLE: Ledger</li></ul>` },
+            { h3: "The Solution", h2: "Project Lattice", p: "We introduce QPaaS. Instead of defensive libraries, we offer offensive simulation. We stress-test keys against quantum noise.", visual: `<div class="metric-box"><div class="metric-val">QPaaS</div><div class="metric-label">Penetration Testing</div></div>` },
+            { h3: "Core Tech", h2: "The Trinity", p: "A recursive loop: Petri (Environment), Janus (Attacker), and Oracle (Judge).", visual: `<ul><li>PETRI: Physics Engine</li><li>JANUS: AI Swarm</li><li>ORACLE: Ledger</li></ul>` },
             { h3: "Deep Tech", h2: "Petri Engine", p: "Simulating Langevin SDEs to mimic decoherence. 10^9 particle steps per second on H100s.", visual: `<div class="metric-box"><div class="metric-val">10^9</div><div class="metric-label">Steps / Sec</div></div>` },
-            { h3: "Deep Tech", h2: "Sentinel Swarm", p: "Reinforcement Learning agents trained to predict entropy trajectories in the Petri environment.", visual: `<div class="img-placeholder">RL AGENT TRAINING</div>` },
+            { h3: "Deep Tech", h2: "Janus Swarm", p: "Reinforcement Learning agents trained to predict entropy trajectories in the Petri environment.", visual: `<div class="img-placeholder">RL AGENT TRAINING</div>` },
             { h3: "The Moat", h2: "Ecosystem IP", p: "Leveraging sister platforms: Helix (Bio-Compute) and Nexus (Simulation) for shared algorithms.", visual: `<ul><li>Shared Physics Kernels</li><li>Shared RL Libraries</li></ul>` },
             { h3: "Market", h2: "The Catalyst", p: "NIST FIPS 203/204 finalized in 2024. Federal mandates force adoption.", visual: `<div class="metric-box"><div class="metric-val">2024</div><div class="metric-label">NIST Finalization</div></div>` },
             { h3: "Market Size", h2: "$10B Opportunity", p: "Projected TAM by 2030. Driven by BFSI and Defense sectors requiring long-term data secrecy.", visual: `<div class="metric-box"><div class="metric-val">$10B</div><div class="metric-label">TAM 2030</div></div>` },
             { h3: "Competition", h2: "Differentiation", p: "SandboxAQ is the generalist. PQShield is the shield. We are the stress test.", visual: `<div class="img-placeholder">VS. SANDBOX AQ</div>` },
             { h3: "Financials", h2: "The Ask", p: "Raising $4M on a SAFE to fund a 12-month engineering sprint to scale the physics engine.", visual: `<div class="metric-box"><div class="metric-val">$4M</div><div class="metric-label">Seed Round</div></div>` },
             { h3: "Roadmap", h2: "Q1: Build", p: "Scaling Petri to massive parallelization on GPU clusters.", visual: `<div class="metric-box"><div class="metric-val">Q1</div><div class="metric-label">Physics Scale</div></div>` },
-            { h3: "Roadmap", h2: "Q2: Train", p: "Calibrating Sentinel agents against standard PRNGs.", visual: `<div class="metric-box"><div class="metric-val">Q2</div><div class="metric-label">AI Calibration</div></div>` },
+            { h3: "Roadmap", h2: "Q2: Train", p: "Calibrating Janus agents against standard PRNGs.", visual: `<div class="metric-box"><div class="metric-val">Q2</div><div class="metric-label">AI Calibration</div></div>` },
             { h3: "Roadmap", h2: "Q3: Integrate", p: "The Trinity Loop (Alpha) goes live.", visual: `<div class="metric-box"><div class="metric-val">Q3</div><div class="metric-label">Alpha Launch</div></div>` },
-            { h3: "Conclusion", h1: "JOIN THE CHAOS", p: "Invest in the infrastructure of the post-quantum era.", visual: `<div class="metric-val">CHIMERA</div>` }
+            { h3: "Conclusion", h1: "JOIN THE CHAOS", p: "Invest in the infrastructure of the post-quantum era.", visual: `<div class="metric-val">LATTICE</div>` }
         ];
 
         // --- ENGINE ---
@@ -362,7 +362,6 @@
         const ctx = canvas.getContext('2d');
         let width, height;
         let particles = [];
-        let sentinels = [];
         let wallX = 0; 
         let shockwave = 0; 
 
@@ -379,7 +378,7 @@
 
         // Particle Types
         const TYPE_FLOW = 0;     // White, attacking (left to right)
-        const TYPE_SENTINEL = 1; // Tiffany, hunting (seeks flow)
+        const TYPE_JANUS = 1;    // Tiffany, hunting (seeks flow)
         const TYPE_DEFENDER = 2; // Tiffany, converted (moves vertically)
 
         class Particle {
@@ -399,14 +398,14 @@
                     this.vy = (Math.random() - 0.5) * 0.5;
                     this.size = Math.random() * 1.5 + 0.5;
                     this.colorRoot = COL_WHITE;
-                } else if (this.type === TYPE_SENTINEL) {
+                } else if (this.type === TYPE_JANUS) {
                     this.x = Math.random() * width;
                     this.y = Math.random() * height;
                     this.vx = (Math.random() - 0.5) * 3;
                     this.vy = (Math.random() - 0.5) * 3;
                     this.size = 2.5; // Bigger
                     this.colorRoot = COL_TIFFANY;
-                    this.decay = 0; // Sentinels don't die easily
+                    this.decay = 0; // Janus agents don't die easily
                 } else if (this.type === TYPE_DEFENDER) {
                     // Start at wall usually, or converted position
                     this.x = wallX + (Math.random() * 20 - 10); 
@@ -435,7 +434,7 @@
                     this.life -= this.decay;
                     if (this.x > width || this.life <= 0) this.reset();
                     
-                } else if (this.type === TYPE_SENTINEL) {
+                } else if (this.type === TYPE_JANUS) {
                     this.x += this.vx;
                     this.y += this.vy;
                     
@@ -444,9 +443,6 @@
                     if (this.y < 0 || this.y > height) this.vy *= -1;
 
                     // HUNT: Find nearby Flow particles
-                    // Simple optimization: Just check random subset or rely on chance
-                    // But for effect, let's scan a small radius
-                    // Note: In a real heavy app we'd use a quadtree. Here we rely on array order.
                 } else if (this.type === TYPE_DEFENDER) {
                     this.x += this.vx; // Should be near 0
                     this.y += this.vy;
@@ -475,7 +471,7 @@
 
             draw() {
                 let alpha = this.life;
-                if (this.type === TYPE_SENTINEL) alpha = 0.8;
+                if (this.type === TYPE_JANUS) alpha = 0.8;
                 if (this.type === TYPE_DEFENDER) alpha = 0.6;
 
                 // Wall Glow override
@@ -495,8 +491,8 @@
             // 1. Flow Particles (Attackers)
             for(let i=0; i<600; i++) particles.push(new Particle(TYPE_FLOW));
             
-            // 2. Sentinels (Adversarial/Tiffany)
-            for(let i=0; i<15; i++) particles.push(new Particle(TYPE_SENTINEL));
+            // 2. Janus Agents (Adversarial/Tiffany)
+            for(let i=0; i<15; i++) particles.push(new Particle(TYPE_JANUS));
         }
 
         function animate() {
@@ -516,15 +512,13 @@
             }
 
             // Logic Loop
-            // We separate update and draw to handle collision logic
             for (let i = 0; i < particles.length; i++) {
                 let p = particles[i];
                 p.update();
                 p.draw();
 
-                // Sentinel Interaction Logic
-                // If this is a Sentinel, check collisions with Flow particles
-                if (p.type === TYPE_SENTINEL) {
+                // Janus Interaction Logic
+                if (p.type === TYPE_JANUS) {
                     for (let j = 0; j < particles.length; j++) {
                         let other = particles[j];
                         if (other.type === TYPE_FLOW) {
@@ -614,5 +608,3 @@
     </script>
 </body>
 </html>
-
-
