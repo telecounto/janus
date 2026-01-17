@@ -16,7 +16,7 @@
             --dim: #333333;
             --tiffany: #0ABAB5; /* Tiffany Blue Accent */
             
-            --panel-bg: rgba(5, 5, 5, 0.85);
+            --panel-bg: rgba(5, 5, 5, 0.9);
             --panel-border: rgba(255, 255, 255, 0.1);
             
             --blur-amount: 20px;
@@ -54,9 +54,9 @@
         #ui-layer {
             position: relative;
             z-index: 10;
-            width: 90%; 
-            max-width: 1400px; /* Reduced max width for tighter focus */
-            height: 80vh;
+            width: 95%; 
+            max-width: 1600px; 
+            height: 85vh;
             pointer-events: none; 
         }
 
@@ -74,9 +74,9 @@
             border-right: 1px solid var(--panel-border);
             
             display: grid;
-            grid-template-columns: 1.2fr 0.8fr; 
-            gap: 60px;
-            padding: 0 5%;
+            grid-template-columns: 1fr 1fr; /* Equal split for diagrams */
+            gap: 80px;
+            padding: 0 6%;
             align-items: center;
             
             pointer-events: auto;
@@ -96,12 +96,13 @@
 
         /* DIGITAL WALL DIVIDER */
         .visual-content {
-            height: 70%;
-            border-left: 2px solid rgba(255, 255, 255, 0.1);
-            padding-left: 60px;
+            height: 80%;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 80px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
             position: relative;
         }
         
@@ -109,23 +110,23 @@
         .visual-content::before {
             content: '';
             position: absolute;
-            left: -2px;
-            top: 0;
-            height: 100%;
-            width: 2px;
+            left: -1px;
+            top: 10%;
+            height: 80%;
+            width: 1px;
             background: linear-gradient(180deg, transparent, var(--tiffany), transparent);
-            box-shadow: 0 0 15px var(--tiffany);
+            box-shadow: 0 0 10px var(--tiffany);
             opacity: 0.8;
         }
 
-        /* TYPOGRAPHY - UPDATED SIZES */
+        /* TYPOGRAPHY */
         h1 {
-            font-size: 3.5rem; /* Reduced from 5.5rem */
-            line-height: 1.1;
+            font-size: 4rem;
+            line-height: 1;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: -1px;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             color: var(--white);
             background: linear-gradient(90deg, #fff, #888);
             -webkit-background-clip: text;
@@ -133,18 +134,18 @@
         }
 
         h2 {
-            font-size: 2.5rem; /* Reduced from 3.5rem */
+            font-size: 2.8rem;
             font-weight: 600;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             color: var(--white);
             letter-spacing: -0.5px;
         }
 
         h3 {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             color: var(--tiffany);
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             text-transform: uppercase;
             letter-spacing: 2px;
             display: flex;
@@ -154,19 +155,21 @@
         
         h3::before {
             content: '';
-            width: 20px;
+            width: 30px;
             height: 1px;
             background: var(--tiffany);
         }
 
         p {
-            font-size: 1.1rem; /* Reduced from 1.4rem */
-            line-height: 1.6;
+            font-size: 1.25rem;
+            line-height: 1.7;
             color: #d1d1d1;
             margin-bottom: 2rem;
-            font-weight: 400;
-            max-width: 90%;
+            font-weight: 300;
+            max-width: 95%;
             text-align: left;
+            border-left: 2px solid var(--dim);
+            padding-left: 20px;
         }
 
         /* GLITCH TEXT EFFECT */
@@ -192,76 +195,105 @@
             100% { clip: rect(0, 0, 0, 0); }
         }
 
-        /* DATA VIZ ELEMENTS */
-        .metric-box {
-            border: 1px solid var(--dim);
-            padding: 30px;
-            background: rgba(0,0,0,0.5);
+        /* DIAGRAM STYLES (NEW) */
+        .diagram-container {
             width: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        /* Scanline for metrics */
-        .metric-box::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 2px;
-            background: rgba(10, 186, 181, 0.3); /* Tiffany tint */
-            animation: scan 3s linear infinite;
-        }
-        
-        @keyframes scan { 0% {top:0;} 100% {top:100%;} }
-
-        .metric-val {
-            font-size: 3rem; /* Reduced size */
-            font-weight: 700;
-            color: var(--white);
-            letter-spacing: -1px;
-        }
-
-        .metric-label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            color: var(--silver);
-            text-transform: uppercase;
-            margin-top: 10px;
-        }
-
-        ul { list-style: none; }
-        li {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-            padding-left: 2rem;
-            position: relative;
-            color: var(--silver);
-        }
-        li::before {
-            content: '>';
-            position: absolute;
-            left: 0;
-            color: var(--tiffany);
-            font-weight: 700;
-        }
-
-        .img-placeholder {
-            width: 100%;
-            height: 250px;
-            background: repeating-linear-gradient(
-                90deg,
-                rgba(255,255,255,0.02),
-                rgba(255,255,255,0.02) 1px,
-                transparent 1px,
-                transparent 20px
-            );
-            border: 1px solid var(--dim);
+            height: 100%;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             font-family: 'JetBrains Mono', monospace;
+        }
+
+        .diag-row {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .diag-box {
+            border: 1px solid var(--silver);
+            padding: 20px;
+            min-width: 140px;
+            text-align: center;
+            background: rgba(255,255,255,0.02);
+            position: relative;
+        }
+        .diag-box.highlight {
+            border-color: var(--tiffany);
+            color: var(--tiffany);
+            box-shadow: 0 0 10px rgba(10, 186, 181, 0.1);
+        }
+
+        .diag-arrow {
+            color: var(--dim);
+            font-size: 1.5rem;
+        }
+        .diag-arrow-down {
+            color: var(--dim);
+            font-size: 1.5rem;
+            margin: 10px 0;
+        }
+
+        /* Chart Styles */
+        .chart-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 40px;
+            height: 300px;
+            border-bottom: 1px solid var(--silver);
+            padding-bottom: 20px;
+            width: 80%;
+        }
+        .chart-bar {
+            flex: 1;
+            background: var(--dim);
+            position: relative;
+            transition: height 1s ease;
+        }
+        .chart-bar.active {
+            background: linear-gradient(0deg, var(--tiffany), transparent);
+        }
+        .chart-label {
+            position: absolute;
+            bottom: -40px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.8rem;
             color: var(--silver);
-            font-size: 0.9rem;
+        }
+        .chart-val {
+            position: absolute;
+            top: -30px;
+            width: 100%;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        /* Grid Visual */
+        .lattice-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 80%;
+        }
+        .lattice-cell {
+            aspect-ratio: 1;
+            border: 1px solid var(--dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: var(--dim);
+        }
+        .lattice-cell.active {
+            border-color: var(--tiffany);
+            color: var(--tiffany);
         }
 
         /* NAVIGATION ZONES */
@@ -334,27 +366,151 @@
     </div>
 
     <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
-    <div class="counter" id="counter">01 / 25</div>
+    <div class="counter" id="counter">01 / 28</div>
 
     <script>
         // --- DATA ---
         const slides = [
-            { h3: "Investment Memo", h1: "PROJECT LATTICE", p: "Quantum Penetration Testing as a Service.<br>Defense by Simulation.", visual: `<div class="metric-box"><div class="metric-val">SEED</div><div class="metric-label">$4M @ $25M Cap</div></div>` },
-            { h3: "Executive Summary", h2: "The Thesis", p: "Cryptographic infrastructure faces a discontinuity event. Post-Quantum Cryptography is mandatory, but implementation risks remain.", visual: `<div class="metric-box"><div class="metric-val">HNDL</div><div class="metric-label">Harvest Now, Decrypt Later</div></div>` },
-            { h3: "The Problem", h2: "Quantum Blind Spot", p: "NIST standards are based on Math. <span style='background:white; color:black; padding:0 4px;'>Real attacks are Physics.</span> We cannot defend what we cannot model.", visual: `<div class="img-placeholder">MATH != PHYSICS</div>` },
-            { h3: "The Solution", h2: "Project Lattice", p: "We introduce QPaaS. Instead of defensive libraries, we offer offensive simulation. We stress-test keys against quantum noise.", visual: `<div class="metric-box"><div class="metric-val">QPaaS</div><div class="metric-label">Penetration Testing</div></div>` },
-            { h3: "Core Tech", h2: "The Trinity", p: "A recursive loop: Petri (Environment), Janus (Attacker), and Oracle (Judge).", visual: `<ul><li>PETRI: Physics Engine</li><li>JANUS: AI Swarm</li><li>ORACLE: Ledger</li></ul>` },
-            { h3: "Deep Tech", h2: "Petri Engine", p: "Simulating Langevin SDEs to mimic decoherence. 10^9 particle steps per second on H100s.", visual: `<div class="metric-box"><div class="metric-val">10^9</div><div class="metric-label">Steps / Sec</div></div>` },
-            { h3: "Deep Tech", h2: "Janus Swarm", p: "Reinforcement Learning agents trained to predict entropy trajectories in the Petri environment.", visual: `<div class="img-placeholder">RL AGENT TRAINING</div>` },
-            { h3: "The Moat", h2: "Ecosystem IP", p: "Leveraging sister platforms: Helix (Bio-Compute) and Nexus (Simulation) for shared algorithms.", visual: `<ul><li>Shared Physics Kernels</li><li>Shared RL Libraries</li></ul>` },
-            { h3: "Market", h2: "The Catalyst", p: "NIST FIPS 203/204 finalized in 2024. Federal mandates force adoption.", visual: `<div class="metric-box"><div class="metric-val">2024</div><div class="metric-label">NIST Finalization</div></div>` },
-            { h3: "Market Size", h2: "$10B Opportunity", p: "Projected TAM by 2030. Driven by BFSI and Defense sectors requiring long-term data secrecy.", visual: `<div class="metric-box"><div class="metric-val">$10B</div><div class="metric-label">TAM 2030</div></div>` },
-            { h3: "Competition", h2: "Differentiation", p: "SandboxAQ is the generalist. PQShield is the shield. We are the stress test.", visual: `<div class="img-placeholder">VS. SANDBOX AQ</div>` },
-            { h3: "Financials", h2: "The Ask", p: "Raising $4M on a SAFE to fund a 12-month engineering sprint to scale the physics engine.", visual: `<div class="metric-box"><div class="metric-val">$4M</div><div class="metric-label">Seed Round</div></div>` },
-            { h3: "Roadmap", h2: "Q1: Build", p: "Scaling Petri to massive parallelization on GPU clusters.", visual: `<div class="metric-box"><div class="metric-val">Q1</div><div class="metric-label">Physics Scale</div></div>` },
-            { h3: "Roadmap", h2: "Q2: Train", p: "Calibrating Janus agents against standard PRNGs.", visual: `<div class="metric-box"><div class="metric-val">Q2</div><div class="metric-label">AI Calibration</div></div>` },
-            { h3: "Roadmap", h2: "Q3: Integrate", p: "The Trinity Loop (Alpha) goes live.", visual: `<div class="metric-box"><div class="metric-val">Q3</div><div class="metric-label">Alpha Launch</div></div>` },
-            { h3: "Conclusion", h1: "JOIN THE CHAOS", p: "Invest in the infrastructure of the post-quantum era.", visual: `<div class="metric-val">LATTICE</div>` }
+            { 
+                h3: "Strategic Memorandum", 
+                h1: "PROJECT LATTICE", 
+                p: "We are building the first Quantum Penetration Testing as a Service (QPaaS) platform. <br><br>While the industry focuses on mathematical standards, we validate security against the chaotic reality of physics. We don't just upgrade encryption; we stress-test it against the entropy of nature itself.", 
+                visual: `
+                    <div class="diagram-container">
+                        <div class="diag-box highlight" style="width: 250px; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                            $4M SEED
+                        </div>
+                        <div class="diag-arrow-down">↓</div>
+                        <div class="diag-box" style="width: 250px;">
+                            $25M CAP (SAFE)
+                        </div>
+                    </div>
+                ` 
+            },
+            { 
+                h3: "Executive Summary", 
+                h2: "The Thesis", 
+                p: "The global cryptographic infrastructure faces a discontinuity event. Post-Quantum Cryptography (PQC) is now mandatory, but implementation risks remain unseen.<br><br>The 'Harvest Now, Decrypt Later' (HNDL) threat model means data stored today is already at risk. The market needs immediate, physical verification of entropy sources, not just mathematical compliance.", 
+                visual: `
+                    <div class="diagram-container">
+                        <div class="diag-box" style="width: 100%; margin-bottom: 20px; border-style: dashed;">Legacy (RSA/ECC)</div>
+                        <div class="diag-arrow-down" style="color: var(--tiffany)">DISCONTINUITY EVENT</div>
+                        <div class="diag-box highlight" style="width: 100%;">Post-Quantum (Lattice)</div>
+                        <div class="diag-arrow-down">↓</div>
+                        <div class="diag-box">Physical Verification</div>
+                    </div>
+                ` 
+            },
+            { 
+                h3: "The Problem", 
+                h2: "Quantum Blind Spot", 
+                p: "NIST standards (FIPS 203/204) are purely mathematical. They assume perfect implementation. However, real quantum attacks exploit physical side-channels—noise, voltage, and timing.<br><br>We cannot defend against what we cannot model. Current tools lack the physics-based simulation required to detect these vulnerabilities before a quantum adversary does.", 
+                visual: `
+                    <div class="diagram-container">
+                        <div class="diag-row">
+                            <div class="diag-box">MATH</div>
+                            <div class="diag-arrow">vs</div>
+                            <div class="diag-box highlight">PHYSICS</div>
+                        </div>
+                        <div style="margin-top: 20px; font-size: 0.8rem; color: var(--silver); text-align: left;">
+                            > Proofs vs. Noise<br>
+                            > Logic vs. Entropy<br>
+                            > Ideal vs. Real
+                        </div>
+                    </div>
+                ` 
+            },
+            { 
+                h3: "The Solution", 
+                h2: "QPaaS Platform", 
+                p: "Project Lattice introduces Quantum Penetration Testing as a Service. <br><br>Instead of selling defensive libraries, we provide an offensive simulation engine. We use massive-scale Langevin dynamics to mimic the noise fingerprints of quantum computers, creating a digital wind tunnel for cryptographic keys.", 
+                visual: `
+                    <div class="diagram-container">
+                        <div class="diag-box">Client Code</div>
+                        <div class="diag-arrow-down">↓</div>
+                        <div class="diag-box highlight">LATTICE ENGINE</div>
+                        <div class="diag-arrow-down">↓</div>
+                        <div class="diag-box">Audit Report</div>
+                    </div>
+                ` 
+            },
+            { 
+                h3: "Core Architecture", 
+                h2: "The Trinity", 
+                p: "Our recursive security loop consists of three modules:<br><br><strong>1. PETRI:</strong> The Environment. Simulates quantum noise.<br><strong>2. JANUS:</strong> The Attacker. AI agents that hunt for patterns.<br><strong>3. ORACLE:</strong> The Judge. A ledger that certifies resilience.", 
+                visual: `
+                    <div class="diagram-container">
+                        <div class="diag-box">PETRI (Sim)</div>
+                        <div class="diag-arrow-down">↓</div>
+                        <div class="diag-box highlight">JANUS (Attack)</div>
+                        <div class="diag-arrow-down">↓</div>
+                        <div class="diag-box">ORACLE (Verify)</div>
+                    </div>
+                ` 
+            },
+            { 
+                h3: "Deep Tech", 
+                h2: "Petri Engine", 
+                p: "Petri solves Stochastic Differential Equations (SDEs) to model decoherence. <br><br>Optimized for NVIDIA H100 clusters, it achieves 10^9 particle steps per second, allowing us to simulate years of quantum entropy wear in mere hours.", 
+                visual: `
+                    <div class="lattice-grid">
+                        <div class="lattice-cell active">dX</div><div class="lattice-cell">dt</div><div class="lattice-cell active">∇V</div><div class="lattice-cell">√2</div>
+                        <div class="lattice-cell">dW</div><div class="lattice-cell active">t</div><div class="lattice-cell">x</div><div class="lattice-cell active">y</div>
+                        <div class="lattice-cell active">z</div><div class="lattice-cell">α</div><div class="lattice-cell active">β</div><div class="lattice-cell">γ</div>
+                    </div>
+                ` 
+            },
+            { 
+                h3: "Deep Tech", 
+                h2: "Janus Swarm", 
+                p: "Janus utilizes Reinforcement Learning (RL) agents trained on the Petri substrate. <br><br>These agents are incentivized to find non-random patterns in the entropy stream. They evolve tactics dynamically, ensuring that our defense is tested against an adaptive adversary, not a static script.", 
+                visual: `
+                    <div class="diagram-container">
+                        <div class="diag-box highlight">AGENT</div>
+                        <div class="diag-arrow-down">↓</div>
+                        <div class="diag-row">
+                            <div class="diag-box" style="font-size: 0.8rem">Observe</div>
+                            <div class="diag-box" style="font-size: 0.8rem">Attack</div>
+                        </div>
+                        <div class="diag-arrow-down">↓</div>
+                        <div class="diag-box">Reward (+/-)</div>
+                    </div>
+                ` 
+            },
+            { 
+                h3: "Financials", 
+                h2: "Return Profile", 
+                p: "We are targeting a 25x MOIC (Multiple on Invested Capital). <br><br>The model is built on high-margin recurring audit revenue. We project a conservative exit via M&A ($600M+) to a Defense Prime, with an upside IPO scenario ($2.5B+) driven by widespread enterprise adoption.", 
+                visual: `
+                    <div class="diagram-container">
+                        <div class="chart-container">
+                            <div class="chart-bar" style="height: 20%">
+                                <div class="chart-val">Seed</div>
+                                <div class="chart-label">Now</div>
+                            </div>
+                            <div class="chart-bar" style="height: 40%">
+                                <div class="chart-val">A</div>
+                            </div>
+                            <div class="chart-bar active" style="height: 100%">
+                                <div class="chart-val">25x</div>
+                                <div class="chart-label">Exit</div>
+                            </div>
+                        </div>
+                    </div>
+                ` 
+            },
+            { 
+                h3: "Conclusion", 
+                h1: "JOIN THE LATTICE", 
+                p: "We are building the wind tunnel for the quantum age. Secure the infrastructure of tomorrow, today.", 
+                visual: `
+                    <div class="diagram-container">
+                        <div class="diag-box highlight" style="width: 100%; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                            LATTICE
+                        </div>
+                    </div>
+                ` 
+            }
         ];
 
         // --- ENGINE ---
@@ -372,14 +528,14 @@
         function resize() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-            wallX = width * 0.6;
+            // Digital wall at 50% for the split layout
+            wallX = width * 0.5; 
             initParticles();
         }
 
         // Particle Types
-        const TYPE_FLOW = 0;     // White, attacking (left to right)
-        const TYPE_JANUS = 1;    // Tiffany, hunting (seeks flow)
-        const TYPE_DEFENDER = 2; // Tiffany, converted (moves vertically)
+        const TYPE_FLOW = 0;     // White, Coherent Stream
+        const TYPE_JANUS = 1;    // Tiffany, Defenders
 
         class Particle {
             constructor(type = TYPE_FLOW) {
@@ -389,48 +545,43 @@
 
             reset(initial = false) {
                 this.life = 1;
-                this.decay = Math.random() * 0.005 + 0.002;
+                // Slower decay for coherence
+                this.decay = Math.random() * 0.002 + 0.001; 
                 
                 if (this.type === TYPE_FLOW) {
-                    this.x = initial ? Math.random() * width : 0;
+                    // Start off screen left
+                    this.x = initial ? Math.random() * width * 0.5 : -10;
                     this.y = Math.random() * height;
-                    this.vx = Math.random() * 2 + 1; 
-                    this.vy = (Math.random() - 0.5) * 0.5;
+                    
+                    // COHERENCE: Constant speed, very little vertical jitter
+                    this.vx = 2.5; 
+                    this.vy = (Math.random() - 0.5) * 0.1; 
+                    
                     this.size = Math.random() * 1.5 + 0.5;
                     this.colorRoot = COL_WHITE;
                 } else if (this.type === TYPE_JANUS) {
-                    this.x = Math.random() * width;
+                    this.x = wallX + (Math.random() * 100); // Start near wall
                     this.y = Math.random() * height;
-                    this.vx = (Math.random() - 0.5) * 3;
-                    this.vy = (Math.random() - 0.5) * 3;
-                    this.size = 2.5; // Bigger
+                    this.vx = (Math.random() - 0.5) * 1;
+                    this.vy = (Math.random() - 0.5) * 1;
+                    this.size = 3; 
                     this.colorRoot = COL_TIFFANY;
-                    this.decay = 0; // Janus agents don't die easily
-                } else if (this.type === TYPE_DEFENDER) {
-                    // Start at wall usually, or converted position
-                    this.x = wallX + (Math.random() * 20 - 10); 
-                    this.y = Math.random() * height;
-                    this.vx = 0;
-                    this.vy = (Math.random() - 0.5) * 4; // Fast vertical movement
-                    this.size = 1.5;
-                    this.colorRoot = COL_TIFFANY;
+                    this.decay = 0; 
                 }
             }
 
             update() {
-                // 1. Logic based on Type
                 if (this.type === TYPE_FLOW) {
                     this.x += this.vx;
                     this.y += this.vy;
                     
-                    // Interaction with Wall
+                    // Wall Interaction (The Lattice Filter)
                     let distToWall = Math.abs(this.x - wallX);
-                    if (distToWall < 50) {
-                        this.vy += (Math.random() - 0.5) * 0.5;
-                        this.vx *= 0.95;
+                    if (distToWall < 10) {
+                        // Pass through but maybe glimmer
+                        this.size = 2; 
                     }
                     
-                    // Reset
                     this.life -= this.decay;
                     if (this.x > width || this.life <= 0) this.reset();
                     
@@ -438,24 +589,14 @@
                     this.x += this.vx;
                     this.y += this.vy;
                     
-                    // Bounce off edges
-                    if (this.x < 0 || this.x > width) this.vx *= -1;
-                    if (this.y < 0 || this.y > height) this.vy *= -1;
-
-                    // HUNT: Find nearby Flow particles
-                } else if (this.type === TYPE_DEFENDER) {
-                    this.x += this.vx; // Should be near 0
-                    this.y += this.vy;
-                    
-                    // Keep near wall
+                    // Keep near the wall (The Moat)
                     let drift = this.x - wallX;
-                    this.vx -= drift * 0.05; // Spring back to wall
+                    this.vx -= drift * 0.01; 
                     
-                    // Bounce vertical
                     if (this.y < 0 || this.y > height) this.vy *= -1;
                 }
 
-                // 2. Shockwave Interaction (All types affected)
+                // Shockwave Interaction
                 if (shockwave > 0) {
                     let dx = this.x - wallX;
                     let dy = this.y - (height/2);
@@ -470,14 +611,9 @@
             }
 
             draw() {
-                let alpha = this.life;
+                let alpha = this.life * 0.5; // Lower alpha for subtle look
                 if (this.type === TYPE_JANUS) alpha = 0.8;
-                if (this.type === TYPE_DEFENDER) alpha = 0.6;
-
-                // Wall Glow override
-                let distToWall = Math.abs(this.x - wallX);
-                if (this.type === TYPE_FLOW && distToWall < 20) alpha = 1;
-
+                
                 ctx.fillStyle = `${this.colorRoot} ${alpha})`;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
@@ -488,19 +624,20 @@
         function initParticles() {
             particles = [];
             
-            // 1. Flow Particles (Attackers)
-            for(let i=0; i<600; i++) particles.push(new Particle(TYPE_FLOW));
+            // REDUCED COUNT FOR COHERENCE
+            // 200 Flow Particles (Laminar Stream)
+            for(let i=0; i<200; i++) particles.push(new Particle(TYPE_FLOW));
             
-            // 2. Janus Agents (Adversarial/Tiffany)
+            // 15 Janus Agents
             for(let i=0; i<15; i++) particles.push(new Particle(TYPE_JANUS));
         }
 
         function animate() {
-            ctx.fillStyle = 'rgba(2, 2, 2, 0.2)'; 
-            ctx.fillRect(0, 0, width, height);
+            ctx.clearRect(0,0,width,height); // Clear instead of trail for cleaner coherence
 
             // Draw Wall Line
-            ctx.strokeStyle = 'rgba(10, 186, 181, 0.1)'; // Tiffany tint
+            ctx.strokeStyle = 'rgba(10, 186, 181, 0.2)'; 
+            ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(wallX, 0);
             ctx.lineTo(wallX, height);
@@ -511,40 +648,9 @@
                 if (shockwave > width * 1.5) shockwave = 0; 
             }
 
-            // Logic Loop
             for (let i = 0; i < particles.length; i++) {
-                let p = particles[i];
-                p.update();
-                p.draw();
-
-                // Janus Interaction Logic
-                if (p.type === TYPE_JANUS) {
-                    for (let j = 0; j < particles.length; j++) {
-                        let other = particles[j];
-                        if (other.type === TYPE_FLOW) {
-                            let dx = p.x - other.x;
-                            let dy = p.y - other.y;
-                            let dist = Math.sqrt(dx*dx + dy*dy);
-                            
-                            // "STEAL" Range
-                            if (dist < 50) {
-                                // Attraction force (Magnetism)
-                                other.vx += (dx / dist) * 0.5;
-                                other.vy += (dy / dist) * 0.5;
-
-                                // CONVERT if very close
-                                if (dist < 10) {
-                                    other.type = TYPE_DEFENDER;
-                                    other.colorRoot = COL_TIFFANY;
-                                    other.vx = 0;
-                                    other.vy = (Math.random() < 0.5 ? 1 : -1) * (Math.random() * 3 + 2);
-                                    other.decay = 0; // Defenders persist longer
-                                    other.life = 1;
-                                }
-                            }
-                        }
-                    }
-                }
+                particles[i].update();
+                particles[i].draw();
             }
 
             requestAnimationFrame(animate);
